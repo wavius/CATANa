@@ -24,6 +24,9 @@ DEVELOPMENT_CARDS_ALLOTMENT = {
 }
 
 RESOURCES = {
+    #String value is the type of resource, int value is the number of cards of that type in the deck
+    #Assigned to individual lists for each resource type 
+    #named "brick_cards", "wood_cards", "sheep_cards", "wheat_cards", "stone_cards"
     "brick": 19,
     "wood": 19,
     "sheep": 19,
@@ -78,13 +81,21 @@ PORTS = [
 
 
 # ----------------------------------------
-# Random Development Card List
+# Card List Generation
 # ----------------------------------------
 
+# Random Development Card List
 development_cards = []
-for res, count in DEVELOPMENT_CARDS_ALLOTMENT.items():
+for card, count in DEVELOPMENT_CARDS_ALLOTMENT.items():
     development_cards.extend([res] * count)
 random.shuffle(development_cards)
+
+# Resource Cards 
+brick_cards = ['brick'] * RESOURCES['brick']
+wood_cards  = ['wood']  * RESOURCES['wood']
+sheep_cards = ['sheep'] * RESOURCES['sheep']
+wheat_cards = ['wheat'] * RESOURCES['wheat']
+stone_cards = ['stone'] * RESOURCES['stone']
 
 # ----------------------------------------
 # Board generation
