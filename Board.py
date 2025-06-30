@@ -1,7 +1,7 @@
 import random
 
-#Recouse Code
-Development_Cards = {
+#Resource Code
+DEVELOPMENT_CARDS = {
     'knight': 14,
     'vic_point': 5,
     'build_road': 2,
@@ -9,7 +9,7 @@ Development_Cards = {
     'monopoly': 2
     }
 
-Resources = {
+RESOURCES = {
     'brick': 19,
     'wood': 19,
     'sheep': 19,
