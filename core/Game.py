@@ -168,7 +168,7 @@ class Game:
         
         for tile_id in valid_hexs:
             for node in self.nodes:
-                if tile_id in node[0] and node[1][owner] != "none":
+                if tile_id in node[0] and node[1][1] != "none":
                     valid_nodes.append(node)
         return valid_nodes
 
