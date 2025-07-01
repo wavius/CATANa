@@ -1,5 +1,19 @@
-from Actions import *
 from enum import Enum
+
+# Enumerate ActionType
+class ActionType(Enum):
+    BUILD_NODE_ID = "build_node_id"
+    BUILD_EDGE_ID = "build_edge_id"
+
+    RESOURCE_GIVE = "resource_give"
+    RESOURCE_GET = "resource_get"
+    RESOURCE_GET_EXTRA = "resource_get_extra"
+
+    TARGET_PLAYER = "target_player"
+    PORT = "port"
+    SPECIAL_RESOURCE_GIVE = "special_resource_give"
+
+    ROBBER_NODE_ID = "robber_node_id"
 
 class Player:
     def __init__(self, player_id):
@@ -26,53 +40,23 @@ class Player:
             'roads': 15
         }
 
+        # Data for all possible actions
+        self.action_data = {
+        # Building data
+        ActionType.BUILD_NODE_ID: int,
+        ActionType.BUILD_EDGE_ID: int,
 
-# Enumeration for all possible actions
-class ActionType(Enum):
-    # Buy actions
-    BUILD_ROAD = "build_road"
-    BUILD_SETTLEMENT = "build_settlement"
-    BUILD_CITY = "build_city"
-    BUY_DEV_CARD = "buy_devcard"
+        # Development card data
+        ActionType.RESOURCE_GIVE: '',
+        ActionType.RESOURCE_GET: '',
+        ActionType.RESOURCE_GET_EXTRA: '',
 
-    # Use development card actions
-    USE_KNIGHT = "use_devcard_knight"
-    USE_BUILDROAD = "use_devcard_buildroad"
-    USE_MONOPOLY = "use_devcard_monopoly"
-    USE_YEAROFPLENTY = "use_devcard_yearofplenty"
+        # Trade data
+        ActionType.TARGET_PLAYER: '',
+        ActionType.PORT: '',
+        ActionType.SPECIAL_RESOURCE_GIVE: '',
 
-    # Trade actions
-    TRADE_BANK = "trade_bank"
-    TRADE_PORT = "trade_port"
-    TRADE_PLAYER = "trade_player"
-
-    # Other actions
-    MOVE_ROBBER = "move_robber"
-    END_TURN = "end_turn"
-
-
-# Defining enumerations to match the action methods
-ACTIONS = {
-    ActionType.BUILD_ROAD: build_road,
-    ActionType.BUILD_SETTLEMENT: build_settlement,
-    ActionType.BUILD_CITY: build_city,
-    ActionType.BUY_DEV_CARD: buy_devcard,
-
-    ActionType.USE_KNIGHT: use_devcard_knight,
-    ActionType.USE_BUILDROAD: use_devcard_buildroad,
-    ActionType.USE_MONOPOLY: use_devcard_monopoly,
-    ActionType.USE_YEAROFPLENTY: use_devcard_yearofplenty,
-
-    ActionType.TRADE_BANK: tradebank,
-    ActionType.TRADE_PORT: tradeport,
-    # ActionType.TRADE_PLAYER: tradeplayer,
-
-    # ActionType.MOVE_ROBBER: moverobber,
-    # ActionType.END_TURN: end_turn
-}
-
-
-# Method to execute general action
-def execute_action(player, board, action_data, action_type):
-    ACTIONS[action_type](player, board, action_data)
+        # Other data
+        ActionType.ROBBER_NODE_ID: int
+        }
 
