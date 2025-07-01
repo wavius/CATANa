@@ -116,14 +116,13 @@ def tradeport(player, game, action_data):
 
 
 # Test functions
-p1 = Player(1)
-p1.cards['brick'] = 1
-p1.cards['wood'] = 1
+#p1 = Player.Player(1)
+#p1.cards['brick'] = 1
+#p1.cards['wood'] = 1
+#print(p1.cards['brick'])
+#print(p1.cards['wood'])
 
-print(p1.cards['brick'])
-print(p1.cards['wood'])
+#build_city(p1)
 
-build_city(p1)
-
-print(p1.cards['wheat'])
-print(p1.cards['stone'])
+#print(p1.cards['wheat'])
+#print(p1.cards['stone'])

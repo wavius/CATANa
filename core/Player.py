@@ -19,7 +19,7 @@ class Player:
             'year_of_plenty': 0,
             'monopoly': 0
         }
-        self.vic_points = int
+        self.vic_points = 0
         self.pieces = {
             'settlements': 5,
             'cities': 4,

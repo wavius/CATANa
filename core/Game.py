@@ -106,7 +106,7 @@ class Game:
         """
         decks = {}
         for resource, count in self.RESOURCES.items():
-            decks[f"{resource}_cards"] = [resource] * count
+            decks[resource] = [resource] * count
         return decks
 
     def generate_board(self):
@@ -287,9 +287,11 @@ class Game:
 # ----------------------------------------
 # Example usage
 # ----------------------------------------
-if __name__ == "__main__":
-    game = Game()
-    # Display the board layout
-    for tid, info in sorted(game.board.items()):
-        resource, token, dots, robber = info
-        print(f"Tile {tid:2d}: {resource:6s} | Token: {str(token):2s} | Dots: {dots} | Robber: {robber}")
+#if __name__ == "__main__":
+#    game = Game()
+#    # Display the board layout
+#    for tid, info in sorted(game.board.items()):
+#        resource, token, dots, robber = info
+#        print(f"Tile {tid:2d}: {resource:6s} | Token: {str(token):2s} | Dots: {dots} | Robber: {robber}")
+
+
