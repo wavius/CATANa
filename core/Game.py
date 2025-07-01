@@ -74,7 +74,7 @@ class Game:
         self.resource_cards = self.generate_resource_cards()
 
         # Generate board tiles + store robber tile id
-        self.robber_id = []
+        self.robber_id = [0]
         self.board = self.generate_board(self.robber_id)
 
         # Static definitions for vertices and edges
