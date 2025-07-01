@@ -1,7 +1,7 @@
 from enum import Enum
 
-# Enumerate ActionType
-class ActionType(Enum):
+# Enumerate ActionData
+class ActionData(Enum):
     BUILD_NODE_ID = "build_node_id"
     BUILD_EDGE_ID = "build_edge_id"
 
@@ -42,21 +42,21 @@ class Player:
 
         # Data for all possible actions
         self.action_data = {
-        # Building data
-        ActionType.BUILD_NODE_ID: int,
-        ActionType.BUILD_EDGE_ID: int,
+            # Building data
+            ActionData.BUILD_NODE_ID: int,
+            ActionData.BUILD_EDGE_ID: int,
 
-        # Development card data
-        ActionType.RESOURCE_GIVE: '',
-        ActionType.RESOURCE_GET: '',
-        ActionType.RESOURCE_GET_EXTRA: '',
+            # Development card data
+            ActionData.RESOURCE_GIVE: '',
+            ActionData.RESOURCE_GET: '',
+            ActionData.RESOURCE_GET_EXTRA: '',
 
-        # Trade data
-        ActionType.TARGET_PLAYER: '',
-        ActionType.PORT: '',
-        ActionType.SPECIAL_RESOURCE_GIVE: '',
+            # Trade data
+            ActionData.TARGET_PLAYER: '',
+            ActionData.PORT: '',
+            ActionData.SPECIAL_RESOURCE_GIVE: '',
 
-        # Other data
-        ActionType.ROBBER_NODE_ID: int
+            # Other data
+            ActionData.ROBBER_NODE_ID: int
         }
 
