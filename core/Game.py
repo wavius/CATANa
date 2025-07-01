@@ -140,6 +140,37 @@ class Game:
                 number = tokens.pop()
                 board[tile_id] = [res, number, self.DOTS[number], False]
         return board
+    
+    # ----------------------------------------
+    # Roll, Robber, and other Game Mechanics
+    # ----------------------------------------
+    def roll_dice(self):
+        """
+        Simulate rolling two dice and returns list of valid Node IDs, which are nodes that are intersected 
+        with the rolled hexes, and have a player settlement or city on them.
+        
+        Returns "robber" if a 7 is rolled.
+        """
+        valid_hexs = []
+        valid_nodes = []
+        die1 = random.randint(1, 6)
+        die2 = random.randint(1, 6)
+        total_roll = die1 + die2
+
+        if total_roll == 7:
+            return ["robber"]
+        else:
+            valid_hexs = []
+            for tile_id in self.board:
+                resource, token, dots, has_robber = self.board[tile_id]
+                if token == total_roll and not has_robber:
+                    valid_hexs.append(tile_id)
+        
+        for tile_id in valid_hexs:
+            for node in self.nodes:
+                if tile_id in node[0] and node[1][owner] != "none":
+                    valid_nodes.append(node)
+        return valid_nodes
 
     # ----------------------------------------
     # Node (vertex) definitions
