@@ -87,7 +87,7 @@ PORTS = [
 # Random Development Card List
 development_cards = []
 for card, count in DEVELOPMENT_CARDS_ALLOTMENT.items():
-    development_cards.extend([card]] * count)
+    development_cards.extend([card] * count)
 random.shuffle(development_cards)
 
 # Resource Cards 
