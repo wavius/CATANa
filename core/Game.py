@@ -73,8 +73,9 @@ class Game:
         self.development_cards = self.generate_development_cards()
         self.resource_cards = self.generate_resource_cards()
 
-        # Generate board tiles
-        self.board = self.generate_board()
+        # Generate board tiles + store robber tile id
+        self.robber_id = []
+        self.board = self.generate_board(self.robber_id)
 
         # Static definitions for vertices and edges
         self.nodes = self.create_nodes()
@@ -109,7 +110,7 @@ class Game:
             decks[resource] = [resource] * count
         return decks
 
-    def generate_board(self):
+    def generate_board(self, robber_id):
         """
         Generate a standard Settlers of Catan board.
 
@@ -129,11 +130,12 @@ class Game:
         # 2) Shuffle number tokens (desert excluded)
         tokens = self.NUMBER_TOKENS.copy()
         random.shuffle(tokens)
-
+    
         board = {}
         for tile_id, res in enumerate(resources, start=1):
             if res == "desert":
                 board[tile_id] = [res, None, 0, True]
+                robber_id[0] = tile_id
             else:
                 number = tokens.pop()
                 board[tile_id] = [res, number, self.DOTS[number], False]
