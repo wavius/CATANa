@@ -26,11 +26,11 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
         pass
     else:
         print("Error: Invalid game turn number.")
-        break
+        
 
     #turn ticker
     net_turn += 1
     game_turn += 1
     if game_turn > 3:
         game_turn = 0
-    break
+    print("End of turn ", net_turn, " for player ", game_turn + 1)
