@@ -5,8 +5,7 @@ import Player
 # Data for all possible actions ---
 action_data = {
     # Player data
-
-
+    "player_names": ['p1', 'p2', 'p3', 'p4'],
 
     # Building data
     "build_node": int,
@@ -68,13 +67,12 @@ def use_devcard_yearofplenty(player, board, action_data):
     player.cards[action_data.get('resource_get')] += 1
     player.cards[action_data.get('resource_get_extra')] += 1
 
-# --- Unsure how to reference players in data dict
-def use_devcard_monopoly(player, board, data):
+def use_devcard_monopoly(player, board, action_data):
     player.cards['monopoly'] -= 1
-    player.cards[action_data.get('resource_get')] = player.card[action_data.get('resource_get')] + player2.card[action_data.get('resource_get')] + player3.card[action_data.get('resource_get')] + player4.card[action_data.get('resource_get')]
-    player2.cards[action_data.get('resource_get')] = 0
-    player3.cards[action_data.get('resource_get')] = 0
-    player4.cards[action_data.get('resource_get')] = 0
+    for item in action_data.get('player_names'):
+        if player != item:
+            player.cards[action_data.get('resource_get')] += item.cards[action_data.get('resource_get')]
+            item.cards[action_data.get('resource_get')] = 0
 
 
 # Trade ---
