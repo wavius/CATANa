@@ -4,6 +4,7 @@ from enum import Enum
 class ActionData(Enum):
     BUILD_NODE_ID = "build_node_id"
     BUILD_EDGE_ID = "build_edge_id"
+    BUILD_EDGE_EXTRA_ID = "build_edge_extra_id"
 
     RESOURCE_GIVE = "resource_give"
     RESOURCE_GET = "resource_get"
@@ -46,6 +47,7 @@ class Player:
             # Building data
             ActionData.BUILD_NODE_ID: int,
             ActionData.BUILD_EDGE_ID: int,
+            ActionData.BUILD_EDGE_EXTRA_ID: int,
 
             # Development card data
             ActionData.RESOURCE_GIVE: '',
