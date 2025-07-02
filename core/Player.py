@@ -51,17 +51,17 @@ class Player:
             ActionData.BUILD_EDGE_EXTRA_ID: int,
 
             # Development card data
-            ActionData.RESOURCE_GIVE: '',
-            ActionData.RESOURCE_GET: '',
-            ActionData.RESOURCE_GET_EXTRA: '',
+            ActionData.RESOURCE_GIVE: str,
+            ActionData.RESOURCE_GET: str,
+            ActionData.RESOURCE_GET_EXTRA: str,
 
             # Trade data
-            ActionData.TARGET_PLAYER: '',
-            ActionData.PORT: '',
-            ActionData.SPECIAL_RESOURCE_GIVE: '',
+            ActionData.TARGET_PLAYER: str,
+            ActionData.PORT: str,
+            ActionData.SPECIAL_RESOURCE_GIVE: str,
 
             # Other data
             ActionData.ROBBER_NODE_ID: int,
-            ActionData.ROBBER_PLAYER_TARGET: ''
+            ActionData.ROBBER_PLAYER_TARGET: str
         }
 
