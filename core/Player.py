@@ -14,6 +14,7 @@ class ActionData(Enum):
     SPECIAL_RESOURCE_GIVE = "special_resource_give"
 
     ROBBER_NODE_ID = "robber_node_id"
+    ROBBER_PLAYER_TARGET = "robber_player_target"
 
 class Player:
     def __init__(self, player_id):
@@ -57,6 +58,7 @@ class Player:
             ActionData.SPECIAL_RESOURCE_GIVE: '',
 
             # Other data
-            ActionData.ROBBER_NODE_ID: int
+            ActionData.ROBBER_NODE_ID: int,
+            ActionData.ROBBER_PLAYER_TARGET: ''
         }
 
