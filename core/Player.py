@@ -20,14 +20,15 @@ class ActionData(Enum):
 class Player:
     def __init__(self, player_id):
         self.id = player_id
-        self.cards = {
+        self.resource_cards = {
             # Resource cards
             'brick': 0,
             'wood': 0,
             'sheep': 0,
             'wheat': 0,
             'stone': 0,
-
+        }
+        self.development_cards = {
             # Development cards
             'knight': 0,
             'vic_point': 0,
