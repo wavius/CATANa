@@ -1,4 +1,5 @@
-import random
+import random 
+
 
 
 class Game:
@@ -171,7 +172,34 @@ class Game:
                touching_tiles, (port, owner, building) = node_data
                if tile_id in touching_tiles and owner != "none":
                     valid_nodes.append(node_id)
-        return valid_nodes
+        return total_roll, valid_nodes
+    
+    # ----------------------------------------
+    # Give resources to players based on rolled nodes
+    # ----------------------------------------
+    def award_resource(self, owner, resource, amount=1):
+        """
+        Take `amount` of `resource` cards from the bank and give them to `owner`.
+
+        Args:
+            owner    : a Player instance (just needs a .resource_cards dict)
+            resource : str, one of "brick", "wood", "sheep", "wheat", "stone"
+            amount   : int, how many cards to transfer
+        """
+        # 1) sanity‐check the bank
+        if resource not in self.resource_cards:
+            raise KeyError(f"Unknown resource '{resource}' in bank.")
+        if self.resource_cards[resource] < amount:
+            raise ValueError(
+                f"Bank is out of {resource}! "
+                f"(has {self.resource_cards[resource]}, needs {amount})"
+            )
+
+        # 2) remove from bank
+        self.resource_cards[resource] -= amount
+
+        # 3) deposit into player’s hand
+        owner.resource_cards[resource] += amount
 
     # ----------------------------------------
     # Node (vertex) definitions

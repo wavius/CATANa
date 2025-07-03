@@ -55,52 +55,90 @@ while net_turn < 2:
         game_turn -= 1
         if game_turn < 0:
             net_turn = 2
+            game_turn = 0
             print("End of start turns, starting game turns now.") #debug only
 
 
 # Game loop
-while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 200 and net_turn >= 2:
+while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 10 and net_turn >= 2:
     print("----------------------------------") #debug only
     if game_turn == 0:
-        current_roll = game.roll_dice()
+        roll_value, current_roll = game.roll_dice()
         if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            valid_hexes = current_roll
-            # Player 1's turn 
+            # Awarding resources to players based on the roll
+            valid_nodes = current_roll
+            for node_id in valid_nodes:
+                touching_tiles, (port, owner, building) = game.nodes[node_id]
+                # for each adjacent tile that rolled this turn:
+                for tile_id in touching_tiles:
+                    resource, token, dots, has_robber = game.board[tile_id]
+                    if not has_robber and token == roll_value:
+                        qty = 2 if building == "city" else 1
+                        game.award_resource(owner, resource, qty)
+            # Player 1's turn
+
         pass
     elif game_turn == 1:
-        current_roll = game.roll_dice()
+        roll_value, current_roll = game.roll_dice()
         if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            valid_hexes = current_roll
+            # Awarding resources to players based on the roll
+            valid_nodes = current_roll
+            for node_id in valid_nodes:
+                touching_tiles, (port, owner, building) = game.nodes[node_id]
+                # for each adjacent tile that rolled this turn:
+                for tile_id in touching_tiles:
+                    resource, token, dots, has_robber = game.board[tile_id]
+                    if not has_robber and token == roll_value:
+                        qty = 2 if building == "city" else 1
+                        game.award_resource(owner, resource, qty)
+            
             # Player 2's turn 
         pass
     elif game_turn == 2:
-        current_roll = game.roll_dice()
+        roll_value, current_roll = game.roll_dice()
         if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            valid_hexes = current_roll
+            # Awarding resources to players based on the roll
+            valid_nodes = current_roll
+            for node_id in valid_nodes:
+                touching_tiles, (port, owner, building) = game.nodes[node_id]
+                # for each adjacent tile that rolled this turn:
+                for tile_id in touching_tiles:
+                    resource, token, dots, has_robber = game.board[tile_id]
+                    if not has_robber and token == roll_value:
+                        qty = 2 if building == "city" else 1
+                        game.award_resource(owner, resource, qty)
             # Player 3's turn 
         pass
     elif game_turn == 3:
-        current_roll = game.roll_dice()
+        roll_value, current_roll = game.roll_dice()
         if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            valid_hexes = current_roll
-            # Player 1's turn 
-        # Player 4's turn 
+            # Awarding resources to players based on the roll
+            valid_nodes = current_roll
+            for node_id in valid_nodes:
+                touching_tiles, (port, owner, building) = game.nodes[node_id]
+                # for each adjacent tile that rolled this turn:
+                for tile_id in touching_tiles:
+                    resource, token, dots, has_robber = game.board[tile_id]
+                    if not has_robber and token == roll_value:
+                        qty = 2 if building == "city" else 1
+                        game.award_resource(owner, resource, qty) 
+            # Player 4's turn 
         pass
     else:
         print("Error: Invalid game turn number. (start turns)")
-        
+    print(current_roll) #debug only   
     #turn ticker
     print("End of turn ", net_turn, " for player ", game_turn + 1)
     game_turn += 1
