@@ -207,15 +207,62 @@ def search_build_road(player, game):
     if player.resource_cards.get('brick') < 1 and player.resource_cards.get('wood') < 1:
         return actions
     else:
+        # Get a list of owned nodes
+        owned_nodes = []
+        for key, data in game.nodes.items():
+            if data[1][1] == player.id:
+                owned_nodes.append(key)
 
-
-
-
-
-
-        
+        # Check adjacent edges to owned nodes and append them to action list
+        for key in owned_nodes:
+            for edge in game.edges:
+                if key in game.edges[edge][0] and game.edges[edge][1] == "none":
+                    add = Action(ActionType.BUILD_ROAD, {Player.ActionData.BUILD_EDGE_ID: edge})
+                    if add not in actions:
+                        actions.append(add)
+            
         return actions
 
+def search_build_settlement(player, game):
+    actions = []
+
+    if player.resource_cards.get('brick') < 1 and player.resource_cards.get('wood') < 1 and player.resource_cards.get('sheep') and player.resource_cards.get('wheat'):
+        return actions
+    else:
+        # Get a list of owned edges
+        owned_edges = []
+        for key, data in game.edges.items():
+            if data[1] == player.id:
+                owned_edges.append(key)
+        
+        # Get a list of open nodes adjacent to owned edges
+        open_nodes = []
+        for key in owned_edges:
+            for node in game.edges[key][0]:
+                if game.nodes[node][1][1] == "none":
+                    if node not in open_nodes:
+                        open_nodes.append(node)
+
+        for item in open_nodes:
+            print(item)
+
+        # Loop over copy of open_nodes with [:]
+        for key in open_nodes[:]:
+            for edge in game.edges:
+                # edge[0] contains the two nodes connected by the edge
+                if key in game.edges[edge][0]:
+                    # Get the other node in the edge
+                    for node in game.edges[edge][0]:
+                        if node != key and game.nodes[node][1][1] != "none":
+                            open_nodes.remove(key)
+                            break  # stop checking this key
+                    break # stop checking other edges after removing key
+
+        for node in open_nodes:
+            add = Action(ActionType.BUILD_SETTLEMENT, {Player.ActionData.BUILD_EDGE_ID: node})
+            actions.append(add)
+        
+        return actions
 
 def search_build_city(player,game):
     actions = []
@@ -251,13 +298,18 @@ game.players[0].resource_cards['brick'] = 10
 p1 = game.players[0]
 
 game.players[0].action_data[Player.ActionData.BUILD_NODE_ID] = 1
+game.players[0].resource_cards['wheat'] += 1
 
 game.nodes[1][1][1] = p1.id
 game.nodes[1][1][2] = 'settlement'
+game.nodes[2][1][1] = p1.id
+game.nodes[2][1][2] = 'settlement'
+game.edges[1][1] = p1.id
+game.edges[2][1] = p1.id
 
 print("----------")
 
-for item in search_build_city(p1, game):
+for item in search_build_settlement(p1,game):
     print(item)
 
 print("----------")
