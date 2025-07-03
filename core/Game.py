@@ -171,9 +171,10 @@ class Game:
                     valid_hexs.append(tile_id)
         
         for tile_id in valid_hexs:
-            for node in self.nodes:
-                if tile_id in node[0] and node[1][1] != "none":
-                    valid_nodes.append(node)
+            for node_id, node_data in self.nodes.items():
+               touching_tiles, (port, owner, building) = node_data
+               if tile_id in touching_tiles and owner != "none":
+                    valid_nodes.append(node_id)
         return valid_nodes
 
     # ----------------------------------------
