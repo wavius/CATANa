@@ -10,6 +10,11 @@ game.players[1] = Player.Player(game.players[1])
 game.players[2] = Player.Player(game.players[2])
 game.players[3] = Player.Player(game.players[3])
 
+p1 = game.players[0]
+p2 = game.players[1]
+p3 = game.players[2]
+p4 = game.players[3]
+
 print( "Players initialized: ", game.players[0].id, game.players[1].id, game.players[2].id, game.players[3].id) #debug only
 
 # Intialize turn variables
@@ -50,11 +55,12 @@ while net_turn < 2:
         game_turn -= 1
         if game_turn < 0:
             net_turn = 2
+            print("End of start turns, starting game turns now.") #debug only
 
 
 # Game loop
 while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 200 and net_turn >= 2:
-    print("----------------------------------")
+    print("----------------------------------") #debug only
     if game_turn == 0:
         current_roll = game.roll_dice()
         if current_roll == "robber":
