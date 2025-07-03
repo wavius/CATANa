@@ -204,7 +204,7 @@ class Action:
 def search_build_road(player, game):
     actions = []
 
-    if player.resource_cards.get('brick') < 1 and player.resource_cards.get('wood') < 1:
+    if player.pieces.get('roads') == 0 or player.resource_cards.get('brick') < 1 or player.resource_cards.get('wood') < 1:
         return actions
     else:
         # Get a list of owned nodes
@@ -226,7 +226,7 @@ def search_build_road(player, game):
 def search_build_settlement(player, game):
     actions = []
 
-    if player.resource_cards.get('brick') < 1 and player.resource_cards.get('wood') < 1 and player.resource_cards.get('sheep') and player.resource_cards.get('wheat'):
+    if player.pieces.get('settlements') == 0 or player.resource_cards.get('brick') < 1 or player.resource_cards.get('wood') < 1 or player.resource_cards.get('sheep') or player.resource_cards.get('wheat'):
         return actions
     else:
         # Get a list of owned edges
@@ -267,7 +267,7 @@ def search_build_settlement(player, game):
 def search_build_city(player,game):
     actions = []
 
-    if player.pieces.get('cities') == 0 or player.resource_cards.get('wheat') < 2 and player.resource_cards.get('stone') < 3:
+    if player.pieces.get('cities') == 0 or player.resource_cards.get('wheat') < 2 or player.resource_cards.get('stone') < 3:
         return actions
     else:
         for node in game.nodes:
@@ -276,6 +276,16 @@ def search_build_city(player,game):
                 actions.append(add)
 
         return actions
+
+def search_buy_devcard(player, game):
+    actions = []
+
+    if not game.development_cards or player.resource_cards.get('wheat') < 1 or player.resource_cards.get('stone') < 1 or player.resource_cards.get('stone') < 1:
+        return actions
+    else:
+        add = Action(ActionType.BUY_DEV_CARD, {})
+        actions.append(add)
+    return actions
 
 # ------------------------------
 # Test
@@ -309,7 +319,7 @@ game.edges[2][1] = p1.id
 
 print("----------")
 
-for item in search_build_settlement(p1,game):
+for item in search_buy_devcard(p1,game):
     print(item)
 
 print("----------")
