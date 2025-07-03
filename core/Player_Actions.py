@@ -224,7 +224,7 @@ def search_build_city(player,game):
         return actions
     else:
         for node in game.nodes:
-            if node[1][1] == player.id and node[1][2] == 'settlement':
+            if game.nodes[node][1][1] == player.id and game.nodes[node][1][2] == 'settlement':
                 add = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_NODE_ID: node})
                 actions.append(add)
 
@@ -252,14 +252,13 @@ p1 = game.players[0]
 
 game.players[0].action_data[Player.ActionData.BUILD_NODE_ID] = 1
 
-print(game.resource_cards)
-
-for item in game.resource_cards:
-    print(item)
-
+game.nodes[1][1][1] = p1.id
+game.nodes[1][1][2] = 'settlement'
 
 print("----------")
 
+for item in search_build_city(p1, game):
+    print(item)
 
 print("----------")
 
