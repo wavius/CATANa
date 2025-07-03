@@ -322,7 +322,7 @@ class Game:
     # ----------------------------------------
     # Generate Player Names
     # ----------------------------------------
-    def generate_player_names():
+    def generate_player_names(self):
         return ["p1", "p2", "p3", "p4", "none"]
 # ----------------------------------------
 # Example usage
