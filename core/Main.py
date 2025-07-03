@@ -60,11 +60,11 @@ while net_turn < 2:
 
 
 # Game loop
-while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 10 and net_turn >= 2:
+while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 75 and net_turn >= 2:
     print("----------------------------------") #debug only
     if game_turn == 0:
         roll_value, current_roll = game.roll_dice()
-        if current_roll == "robber":
+        if current_roll == ["robber"]:
             #robber turn code
             pass 
         else:
@@ -83,7 +83,7 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
         pass
     elif game_turn == 1:
         roll_value, current_roll = game.roll_dice()
-        if current_roll == "robber":
+        if current_roll == ["robber"]:
             #robber turn code
             pass 
         else:
@@ -102,7 +102,7 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
         pass
     elif game_turn == 2:
         roll_value, current_roll = game.roll_dice()
-        if current_roll == "robber":
+        if current_roll == ["robber"]:
             #robber turn code
             pass 
         else:
@@ -120,7 +120,7 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
         pass
     elif game_turn == 3:
         roll_value, current_roll = game.roll_dice()
-        if current_roll == "robber":
+        if current_roll == ["robber"]:
             #robber turn code
             pass 
         else:

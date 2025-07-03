@@ -1,40 +1,62 @@
 from enum import Enum
+from dataclasses import dataclass
 import random
 import Player
 import Game
 # --- = work in progress
 
 
+# ------------------------------
+# Execute action methods
+# ------------------------------
+
+"Any data needed to execute a move is first updated in action_data dict in Player class"
+"Execute action methods are then called"
+
 # Build
 def build_road(player, game):
     player.resource_cards['wood'] -= 1
     player.resource_cards['brick'] -= 1
+    game.resource_cards['wood'] += 1
+    game.resource_cards['brick'] += 1
+
     player.pieces['roads'] -= 1
-    game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1] = player
+    game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1] = player.id
 
 def build_settlement(player, game):
     player.resource_cards['wood'] -= 1
     player.resource_cards['brick'] -= 1
     player.resource_cards['sheep'] -= 1
     player.resource_cards['wheat'] -= 1
+    game.resource_cards['wood'] += 1
+    game.resource_cards['brick'] += 1
+    game.resource_cards['sheep'] += 1
+    game.resource_cards['wheat'] += 1
+
     player.vic_points += 1
     player.pieces['settlements'] -= 1
-    game.nodes[player.action_data.get(Player.ActionData.BUILD_EDGE_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1][1] = player
-    game.nodes[player.action_data.get(Player.ActionData.BUILD_EDGE_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1][2] = 'settlement'
+    game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][1] = player.id
+    game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
 
 def build_city(player, game):
     player.resource_cards['wheat'] -= 2
     player.resource_cards['stone'] -= 3
+    game.resource_cards['wheat'] += 2
+    game.resource_cards['stone'] += 3
+
     player.pieces['cities'] -= 1
     player.vic_points += 1
-    game.nodes[player.action_data.get(Player.ActionData.BUILD_EDGE_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1][1] = player
-    game.nodes[player.action_data.get(Player.ActionData.BUILD_EDGE_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1][2] = 'city'
+    game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][1] = player.id
+    game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][2] = 'city'
 
 # Buy development card
 def buy_devcard(player, game):
     player.resource_cards['wheat'] -= 1
     player.resource_cards['sheep'] -= 1
     player.resource_cards['stone'] -= 1
+    game.resource_cards['wheat'] += 1
+    game.resource_cards['sheep'] += 1
+    game.resource_cards['stone'] += 1
 
     drawn_card = game.development_cards.pop()
     player.development_cards[drawn_card] += 1
@@ -42,6 +64,7 @@ def buy_devcard(player, game):
         player.vic_points += 1
 
 # Use development cards
+##
 def use_devcard_knight(player, game):
     player.development_cards['knight'] -= 1
     move_robber(player, game)
@@ -49,38 +72,45 @@ def use_devcard_knight(player, game):
 def use_devcard_buildroad(player, game):
     player.development_cards['build_road'] -= 1
     player.pieces['roads'] -= 2
-    game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1] = player
-    game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_EXTRA_ID) - 1][player.action_data.get(Player.ActionData.BUILD_EDGE_EXTRA_ID)][1] = player
+    game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1] = player.id
+    game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_EXTRA_ID)][1] = player.id
 
 def use_devcard_yearofplenty(player, game):
     player.development_cards['year_of_plenty'] -= 1
+
+    player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] -= 1
+    player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET_EXTRA)] -= 1
     player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += 1
     player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET_EXTRA)] += 1
 
 def use_devcard_monopoly(player, game):
-    player.cards['monopoly'] -= 1
-    for item in game.PLAYERS:
-        if player != item and player != 'none':
-            player.cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += item.cards[player.action_data.get(Player.ActionData.RESOURCE_GET)]
-            item.cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] = 0
+    player.development_cards['monopoly'] -= 1
+    for item in game.players:
+        if item != player and item != 'none':
+            player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += item.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)]
+            item.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] = 0
 
 # Trade
 def trade_bank(player, game):
     player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GIVE)] -= 4
-    player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GIVE)] += 1
+    player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += 1
+    player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GIVE)] += 4
+    player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] -= 1
 
 def trade_port(player, game):
-    if player.action_data.get() == '3:1':
+    if player.action_data.get(Player.ActionData.PORT) == '3:1':
         player.resource_cards[player.action_data.get(Player.ActionData.SPECIAL_RESOURCE_GIVE)] -= 3
         player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += 1
+        player.resource_cards[player.action_data.get(Player.ActionData.SPECIAL_RESOURCE_GIVE)] += 3
+        player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] -= 1
     else:
         player.resource_cards[player.action_data.get(Player.ActionData.PORT)] -= 2
         player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += 1
-
-# Trade player ---
-
+        player.resource_cards[player.action_data.get(Player.ActionData.PORT)] += 2
+        player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] -= 1
 
 # Move robber
+##
 def move_robber(player, game):
     game.board[game.robber_id[0]][3] = False
     game.robber_id[0] = player.action_data.get(Player.ActionData.ROBBER_NODE_ID)
@@ -101,9 +131,10 @@ def move_robber(player, game):
     for item in card_list:
         target_player.resource_cards[item] += 1
 
-
+# ------------------------------
 # End turn ---
-
+# Trade player ---
+# ------------------------------
 
 # Enumeration for all possible actions
 class ActionType(Enum):
@@ -153,10 +184,114 @@ def execute_action(player, game, action_type):
     ACTIONS[action_type](player, game)
 
 
+# ------------------------------
+# Search action methods
+# ------------------------------
+
+"Searches for all available moves in categories:"
+"- Build/Buy"
+"- Use development cards"
+"- Trade"
+"- Other"
+"Appends all actions to respective lists"
+
+# Dataclass to store action type and related action data for each action
+@dataclass
+class Action:
+    type: ActionType
+    data: dict
+
+def search_build_road(player, game):
+    actions = []
+
+    if player.resource_cards.get('brick') < 1 and player.resource_cards.get('wood') < 1:
+        return actions
+    else:
 
 
-# Test functions
-p1 = Player.Player(1)
+
+
+
+
+        
+        return actions
+
+
+def search_build_city(player,game):
+    actions = []
+
+    if player.pieces.get('cities') == 0 or player.resource_cards.get('wheat') < 2 and player.resource_cards.get('stone') < 3:
+        return actions
+    else:
+        for node in game.nodes:
+            if game.nodes[node][1][1] == player.id and game.nodes[node][1][2] == 'settlement':
+                add = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_NODE_ID: node})
+                actions.append(add)
+
+        return actions
+
+# ------------------------------
+# Test
+# ------------------------------
+
 game = Game.Game()
 
-print(game.board[game.robber_id[0]][3])
+game.players[0] = Player.Player(game.players[0])
+game.players[1] = Player.Player(game.players[1])
+game.players[2] = Player.Player(game.players[2])
+game.players[3] = Player.Player(game.players[3])
+
+
+game.players[0].resource_cards['wheat'] = 10
+game.players[0].resource_cards['stone'] = 10
+game.players[0].resource_cards['wood'] = 10
+game.players[0].resource_cards['sheep'] = 10
+game.players[0].resource_cards['brick'] = 10
+
+p1 = game.players[0]
+
+game.players[0].action_data[Player.ActionData.BUILD_NODE_ID] = 1
+
+game.nodes[1][1][1] = p1.id
+game.nodes[1][1][2] = 'settlement'
+
+print("----------")
+
+for item in search_build_city(p1, game):
+    print(item)
+
+print("----------")
+
+
+
+
+
+
+
+
+
+
+
+
+#game.nodes[1][2][1][2] = 'settlement'
+
+#test = search_build_city(p1,game)
+
+#for item in test:
+#    print(item)
+
+
+
+
+
+#list = []
+#add = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_EDGE_ID: 99, Player.ActionData.BUILD_EDGE_EXTRA_ID: 99})
+#list.append(add)
+
+# Assigning action_data from action in list
+# for item in list:
+#    for key in item.data.keys():
+#        p1.action_data[key] = item.data.get(key)
+    
+#for data in p1.action_data:
+#    print(p1.action_data.get(data))

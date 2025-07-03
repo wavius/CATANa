@@ -159,7 +159,7 @@ class Game:
         total_roll = die1 + die2
 
         if total_roll == 7:
-            return ["robber"]
+            return total_roll, ["robber"]
         else:
             valid_hexs = []
             for tile_id in self.board:
