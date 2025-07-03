@@ -10,6 +10,7 @@ game.players[1] = Player.Player(game.players[1])
 game.players[2] = Player.Player(game.players[2])
 game.players[3] = Player.Player(game.players[3])
 print( "Players initialized: ", game.players[0].id, game.players[1].id, game.players[2].id, game.players[3].id) #debug only
+
 # Intialize turn variables
 game_turn = 0
 net_turn = 0
