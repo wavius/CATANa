@@ -14,7 +14,6 @@ class Game:
     # ----------------------------------------
     # Class-level constants
     # ----------------------------------------
-    # If changed, update the player names in generate_player_names() 
     PLAYERS = ["p1", "p2", "p3", "p4", "none"]
 
     #Randomly shuffled to list of development cards stored in list called "development_cards"
@@ -104,15 +103,12 @@ class Game:
 
     def generate_resource_cards(self):
         """
-        Build separate decks for each resource type.
+        Returns a dict of resource + int count 
 
         Returns:
-            dict[str, list[str]]: mapping resource name to its card list
+            dict[str: int] where keys are resource names and values are amount held in deck
         """
-        decks = {}
-        for resource, count in self.RESOURCES.items():
-            decks[resource] = [resource] * count
-        return decks
+        return self.RESOURCES.copy()
 
     def generate_board(self, robber_id):
         """
@@ -324,7 +320,7 @@ class Game:
     # Generate Player Names
     # ----------------------------------------
     def generate_player_names(self):
-        return ["p1", "p2", "p3", "p4", "none"]
+        return self.PLAYERS.copy()
 # ----------------------------------------
 # Example usage
 # ----------------------------------------
