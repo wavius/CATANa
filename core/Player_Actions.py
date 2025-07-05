@@ -113,23 +113,24 @@ def trade_port(player, game):
 ##
 def move_robber(player, game):
     game.board[game.robber_id[0]][3] = False
-    game.robber_id[0] = player.action_data.get(Player.ActionData.ROBBER_NODE_ID)
+    game.robber_id[0] = player.action_data.get(Player.ActionData.ROBBER_TILE_ID)
     game.board[game.robber_id[0]][3] = True
 
-    target_player = player.action_data.get(Player.ActionData.ROBBER_PLAYER_TARGET)
-    card_list = []
-    
-    for item in target_player.resource_cards:
-        count = target_player.resource_cards.get(item)
-        for i in range(count):
-            card_list.append(item)
-        target_player.resource_cards[item] = 0
+    if player.action_data.get(Player.ActionData.ROBBER_PLAYER_TARGET) != "none":
+        target_player = player.action_data.get(Player.ActionData.ROBBER_PLAYER_TARGET)
+        card_list = []
+        
+        for item in target_player.resource_cards:
+            count = target_player.resource_cards.get(item)
+            for i in range(count):
+                card_list.append(item)
+            target_player.resource_cards[item] = 0
 
-    random.shuffle(card_list)
-    player.resource_cards[card_list.pop()] += 1
+        random.shuffle(card_list)
+        player.resource_cards[card_list.pop()] += 1
 
-    for item in card_list:
-        target_player.resource_cards[item] += 1
+        for item in card_list:
+            target_player.resource_cards[item] += 1
 
 # ------------------------------
 # End turn ---
@@ -217,9 +218,9 @@ def search_build_road(player, game):
         for key in owned_nodes:
             for edge in game.edges:
                 if key in game.edges[edge][0] and game.edges[edge][1] == "none":
-                    add = Action(ActionType.BUILD_ROAD, {Player.ActionData.BUILD_EDGE_ID: edge})
-                    if add not in actions:
-                        actions.append(add)
+                    new_action = Action(ActionType.BUILD_ROAD, {Player.ActionData.BUILD_EDGE_ID: edge})
+                    if new_action not in actions:
+                        actions.append(new_action)
             
         return actions
 
@@ -259,8 +260,8 @@ def search_build_settlement(player, game):
                     break # stop checking other edges after removing key
 
         for node in open_nodes:
-            add = Action(ActionType.BUILD_SETTLEMENT, {Player.ActionData.BUILD_EDGE_ID: node})
-            actions.append(add)
+            new_action = Action(ActionType.BUILD_SETTLEMENT, {Player.ActionData.BUILD_EDGE_ID: node})
+            actions.append(new_action)
         
         return actions
 
@@ -272,8 +273,8 @@ def search_build_city(player,game):
     else:
         for node in game.nodes:
             if game.nodes[node][1][1] == player.id and game.nodes[node][1][2] == 'settlement':
-                add = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_NODE_ID: node})
-                actions.append(add)
+                new_action = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_NODE_ID: node})
+                actions.append(new_action)
 
         return actions
 
@@ -283,8 +284,100 @@ def search_buy_devcard(player, game):
     if not game.development_cards or player.resource_cards.get('wheat') < 1 or player.resource_cards.get('stone') < 1 or player.resource_cards.get('stone') < 1:
         return actions
     else:
-        add = Action(ActionType.BUY_DEV_CARD, {})
-        actions.append(add)
+        new_action = Action(ActionType.BUY_DEV_CARD, {})
+        actions.append(new_action)
+    return actions
+
+# Work in progress
+def search_devcard_knight(player, game):
+    actions = []
+    if player.development_cards.get('year_of_plenty') < 1:
+        return actions
+    else:
+        return actions
+
+#def search_devcard_buildroad(player, game):
+
+def search_devcard_yearofplenty(player, game):
+    actions = []
+    if player.development_cards.get('year_of_plenty') < 1:
+        return actions
+    else:
+        for items in player.resource_cards.items():
+            for items_extra in player.resource_cards.items():
+                new_action = Action(ActionType.USE_YEAROFPLENTY, {Player.ActionData.RESOURCE_GET: items[0], Player.ActionData.RESOURCE_GET_EXTRA: items_extra[0]})
+                actions.append(new_action)
+        return actions
+
+def search_devcard_monopoly(player, game):
+    actions = []
+    if player.development_cards.get('monopoly') < 1:
+        return actions
+    else:
+        for items in player.resource_cards.items():
+            new_action = Action(ActionType.USE_MONOPOLY, {Player.ActionData.RESOURCE_GET: items[0]})
+            actions.append(new_action)
+        return actions
+    
+def search_trade_bank(player, game):
+    actions = []
+    for item in player.resource_cards.items():
+        if item[1] >= 4:
+            for item_extra in player.resource_cards.items():
+                if item[0] != item_extra[0]:
+                    new_action = Action(ActionType.TRADE_BANK, {Player.ActionData.RESOURCE_GIVE: item[0], Player.ActionData.RESOURCE_GET: item_extra[0]})
+                    actions.append(new_action)
+    return actions
+
+def search_trade_port(player, game):
+    actions = []
+    port_nodes = [1, 2, 4, 5, 8, 9, 11, 12, 14, 18, 19, 21, 22, 24, 25, 28, 29]
+    owned_ports = []
+
+    # Get list of owned ports
+    for node in port_nodes:
+        if game.nodes[node][1][1] == player.id:
+            if game.nodes[node][1][0] not in owned_ports:
+                owned_ports.append(game.nodes[node][1][0])
+
+    # 3:1 port actions
+    if "3:1" in owned_ports:
+        for item in player.resource_cards.items():
+            if item[1] >= 3:
+                for item_extra in player.resource_cards.items():
+                    if item[0] != item_extra[0]:
+                        new_action = Action(ActionType.TRADE_PORT, {Player.ActionData.SPECIAL_RESOURCE_GIVE: item[0], Player.ActionData.RESOURCE_GET: item_extra[0]})
+                        actions.append(new_action)
+
+    # 2:1 port actions
+    for port in owned_ports:
+        if port != "3:1" and player.resource_cards.get(port) >= 2:
+            for item in player.resource_cards.items():
+                    if port != item[0]:
+                        new_action = Action(ActionType.TRADE_PORT, {Player.ActionData.SPECIAL_RESOURCE_GIVE: port, Player.ActionData.RESOURCE_GET: item[0]})
+                        actions.append(new_action)
+
+    return actions
+
+def search_move_robber(player, game):
+    actions = []
+    tiles = set(range(1, 20))
+    seen_tiles = set()
+
+    for node in game.nodes:
+        for tile in game.nodes[node][0]:
+            if tile != game.robber_id[0]:
+                if game.nodes[node][1][1] != "none" and game.nodes[node][1][1] != player.id:
+                    new_action = Action(ActionType.MOVE_ROBBER, {Player.ActionData.ROBBER_TILE_ID: tile, Player.ActionData.ROBBER_PLAYER_TARGET: game.nodes[node][1][1]})
+                    if new_action not in actions:
+                        seen_tiles.add(tile)
+                        actions.append(new_action)
+
+    for tile in (tiles - seen_tiles):
+        if tile != game.robber_id[0]:
+            new_action = Action(ActionType.MOVE_ROBBER, {Player.ActionData.ROBBER_TILE_ID: tile, Player.ActionData.ROBBER_PLAYER_TARGET: "none"})
+            actions.append(new_action)
+
     return actions
 
 # ------------------------------
@@ -304,25 +397,34 @@ game.players[0].resource_cards['stone'] = 10
 game.players[0].resource_cards['wood'] = 10
 game.players[0].resource_cards['sheep'] = 10
 game.players[0].resource_cards['brick'] = 10
+game.players[0].development_cards['monopoly'] = 10
 
 p1 = game.players[0]
+p2 = game.players[1]
+p3 = game.players[2]
 
 game.players[0].action_data[Player.ActionData.BUILD_NODE_ID] = 1
 game.players[0].resource_cards['wheat'] += 1
 
-game.nodes[1][1][1] = p1.id
+game.nodes[1][1][1] = p3.id
 game.nodes[1][1][2] = 'settlement'
-game.nodes[2][1][1] = p1.id
+game.nodes[2][1][1] = p2.id
 game.nodes[2][1][2] = 'settlement'
 game.edges[1][1] = p1.id
 game.edges[2][1] = p1.id
 
+
+print(game.robber_id)
 print("----------")
 
-for item in search_buy_devcard(p1,game):
+
+list = search_move_robber(p1, game)
+for item in list:
     print(item)
 
 print("----------")
+
+print(len(list))
 
 
 
@@ -347,8 +449,8 @@ print("----------")
 
 
 #list = []
-#add = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_EDGE_ID: 99, Player.ActionData.BUILD_EDGE_EXTRA_ID: 99})
-#list.append(add)
+#new_action = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_EDGE_ID: 99, Player.ActionData.BUILD_EDGE_EXTRA_ID: 99})
+#list.append(new_action)
 
 # Assigning action_data from action in list
 # for item in list:
