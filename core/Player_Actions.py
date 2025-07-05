@@ -208,20 +208,22 @@ def search_build_road(player, game):
     if player.pieces.get('roads') == 0 or player.resource_cards.get('brick') < 1 or player.resource_cards.get('wood') < 1:
         return actions
     else:
-        # Get a list of owned nodes
-        owned_nodes = []
-        for key, data in game.nodes.items():
-            if data[1][1] == player.id:
-                owned_nodes.append(key)
+        # Edges owned by the player
+        owned_edges = [eid for eid, data in game.edges.items() if data[1] == player.id]
 
-        # Check adjacent edges to owned nodes and append them to action list
-        for key in owned_nodes:
-            for edge in game.edges:
-                if key in game.edges[edge][0] and game.edges[edge][1] == "none":
-                    new_action = Action(ActionType.BUILD_ROAD, {Player.ActionData.BUILD_EDGE_ID: edge})
-                    if new_action not in actions:
-                        actions.append(new_action)
-            
+        # Candidate edges adjacent to the player's roads
+        open_edges = set()
+        for id in owned_edges:
+            node1, node2 = game.edges[id][0]
+            for adj_id, adj_data in game.edges.items():
+                if adj_data[1] == "none" and adj_id != id:
+                    if node1 in adj_data[0] or node2 in adj_data[0]:
+                        open_edges.add(adj_id)
+
+        for edge_id in open_edges:
+            new_action = Action(ActionType.BUILD_ROAD, {Player.ActionData.BUILD_EDGE_ID: edge_id})
+            actions.append(new_action)
+
         return actions
 
 def search_build_settlement(player, game):
@@ -243,9 +245,6 @@ def search_build_settlement(player, game):
                 if game.nodes[node][1][1] == "none":
                     if node not in open_nodes:
                         open_nodes.append(node)
-
-        for item in open_nodes:
-            print(item)
 
         # Loop over copy of open_nodes with [:]
         for key in open_nodes[:]:
@@ -289,11 +288,12 @@ def search_buy_devcard(player, game):
     return actions
 
 def search_devcard_knight(player, game):
+    actions = []
+
     if player.development_cards.get('knight') < 1:
-        return []
+        return actions
     else:
-        # Copy of search_move_robber with ActionType.USE_KNIGHT instead of ActionType.MOVE_ROBBER
-        actions = []
+        # Copy of search_move_robber() with ActionType.USE_KNIGHT instead of ActionType.MOVE_ROBBER
         tiles = set(range(1, 20))
         seen_tiles = set()
 
@@ -315,8 +315,53 @@ def search_devcard_knight(player, game):
 
         return actions
 
+def search_devcard_buildroad(player, game):
+    actions = []
 
-#def search_devcard_buildroad(player, game):
+    if player.development_cards.get('build_road') < 1:
+        return actions
+    else:
+         # Get a set of owned nodes
+        owned_nodes = set()
+        for key, data in game.nodes.items():
+            if data[1][1] == player.id:
+                owned_nodes.add(key)
+
+        road_pairs = []
+
+        # Check open edges for first road
+        first_road_ids = buildroad_helper(player, game)
+
+        # Check open edges for second roads after first road has been placed
+        for id in first_road_ids:
+            copy = game
+            copy.edges[id][1] = player.id
+            second_road_ids = buildroad_helper(player, copy)
+            road_pairs.append(id, second_road_ids)
+
+        for pair in road_pairs:
+            for id in pair[1]:
+                new_action = Action(ActionType.USE_BUILDROAD, {Player.ActionData.BUILD_EDGE_ID: pair[0], Player.ActionData.BUILD_EDGE_EXTRA_ID: id})
+                if new_action not in actions:
+                    actions.append(new_action)
+
+        return actions
+
+# Helper function that returns a set of valid edge ids for placing a road
+def buildroad_helper(player, game):
+    # Edges owned by the player
+    owned_edges = [eid for eid, data in game.edges.items() if data[1] == player.id]
+
+    # Open edges adjacent to the player's roads
+    open_edges = set()
+    for id in owned_edges:
+        node1, node2 = game.edges[id][0]
+        for adj_id, adj_data in game.edges.items():
+            if adj_data[1] == "none" and adj_id != id:
+                if node1 in adj_data[0] or node2 in adj_data[0]:
+                    open_edges.add(adj_id)
+
+    return open_edges
 
 def search_devcard_yearofplenty(player, game):
     actions = []
@@ -402,9 +447,25 @@ def search_move_robber(player, game):
 
     return actions
 
+# General search function to find all actions on player turn
+def search_all(player, game):
+    actions = []
+    actions.append(search_build_road(player, game))
+    actions.append(search_build_settlement(player, game))
+    actions.append(search_build_city(player, game))
+    actions.append(search_buy_devcard(player, game))
+    actions.append(search_devcard_knight(player, game))
+    actions.append(search_devcard_buildroad(player, game))
+    actions.append(search_devcard_yearofplenty(player, game))
+    actions.append(search_devcard_monopoly(player, game))
+    actions.append(search_trade_bank(player, game))
+    actions.append(search_trade_port(player, game))
+    return actions
+
 # ------------------------------
 # Test
 # ------------------------------
+
 
 game = Game.Game()
 
@@ -419,7 +480,7 @@ game.players[0].resource_cards['stone'] = 10
 game.players[0].resource_cards['wood'] = 10
 game.players[0].resource_cards['sheep'] = 10
 game.players[0].resource_cards['brick'] = 10
-game.players[0].development_cards['monopoly'] = 10
+game.players[0].development_cards['build_road'] = 10
 
 p1 = game.players[0]
 p2 = game.players[1]
