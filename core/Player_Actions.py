@@ -1,6 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 import random
+import copy
 import Player
 import Game
 # --- = work in progress
@@ -327,23 +328,30 @@ def search_devcard_buildroad(player, game):
             if data[1][1] == player.id:
                 owned_nodes.add(key)
 
-        road_pairs = []
+        # Store tuples of (edge_min, edge_max)
+        seen_pairs = set()
 
         # Check open edges for first road
         first_road_ids = buildroad_helper(player, game)
 
         # Check open edges for second roads after first road has been placed
-        for id in first_road_ids:
-            copy = game
-            copy.edges[id][1] = player.id
-            second_road_ids = buildroad_helper(player, copy)
-            road_pairs.append(id, second_road_ids)
+        for id1 in first_road_ids:
+            game_copy = copy.deepcopy(game)
+            game_copy.edges[id1][1] = player.id
+            second_road_ids = buildroad_helper(player, game_copy)
+            
+            for id2 in second_road_ids:
+                # Sort the edge pairs to filter duplicates
+                pair = tuple(sorted((id1, id2)))
 
-        for pair in road_pairs:
-            for id in pair[1]:
-                new_action = Action(ActionType.USE_BUILDROAD, {Player.ActionData.BUILD_EDGE_ID: pair[0], Player.ActionData.BUILD_EDGE_EXTRA_ID: id})
-                if new_action not in actions:
-                    actions.append(new_action)
+                # Skip loop iteration if pair was used
+                if pair in seen_pairs:
+                    continue
+
+                seen_pairs.add(pair)
+
+                new_action = Action(ActionType.USE_BUILDROAD, {Player.ActionData.BUILD_EDGE_ID: pair[0], Player.ActionData.BUILD_EDGE_EXTRA_ID: pair[1]})
+                actions.append(new_action)
 
         return actions
 
@@ -449,18 +457,19 @@ def search_move_robber(player, game):
 
 # General search function to find all actions on player turn
 def search_all(player, game):
-    actions = []
-    actions.append(search_build_road(player, game))
-    actions.append(search_build_settlement(player, game))
-    actions.append(search_build_city(player, game))
-    actions.append(search_buy_devcard(player, game))
-    actions.append(search_devcard_knight(player, game))
-    actions.append(search_devcard_buildroad(player, game))
-    actions.append(search_devcard_yearofplenty(player, game))
-    actions.append(search_devcard_monopoly(player, game))
-    actions.append(search_trade_bank(player, game))
-    actions.append(search_trade_port(player, game))
-    return actions
+    # Flatten lists with * (unpacking operator) to get a clean list instead of a list of lists
+    return [
+        *search_build_road(player, game),
+        *search_build_settlement(player, game),
+        *search_build_city(player, game),
+        *search_buy_devcard(player, game),
+        *search_devcard_knight(player, game),
+        *search_devcard_buildroad(player, game),
+        *search_devcard_yearofplenty(player, game),
+        *search_devcard_monopoly(player, game),
+        *search_trade_bank(player, game),
+        *search_trade_port(player, game)
+    ]
 
 # ------------------------------
 # Test
@@ -489,19 +498,13 @@ p3 = game.players[2]
 game.players[0].action_data[Player.ActionData.BUILD_NODE_ID] = 1
 game.players[0].resource_cards['wheat'] += 1
 
-game.nodes[1][1][1] = p3.id
-game.nodes[1][1][2] = 'settlement'
-game.nodes[2][1][1] = p2.id
-game.nodes[2][1][2] = 'settlement'
+
 game.edges[1][1] = p1.id
-game.edges[2][1] = p1.id
 
-
-print(game.robber_id)
 print("----------")
 
 
-list = search_move_robber(p1, game)
+list = search_all(p1, game)
 for item in list:
     print(item)
 
