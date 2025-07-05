@@ -288,13 +288,33 @@ def search_buy_devcard(player, game):
         actions.append(new_action)
     return actions
 
-# Work in progress
 def search_devcard_knight(player, game):
-    actions = []
-    if player.development_cards.get('year_of_plenty') < 1:
-        return actions
+    if player.development_cards.get('knight') < 1:
+        return []
     else:
+        # Copy of search_move_robber with ActionType.USE_KNIGHT instead of ActionType.MOVE_ROBBER
+        actions = []
+        tiles = set(range(1, 20))
+        seen_tiles = set()
+
+        # Append tiles with adjacent players
+        for node in game.nodes:
+            for tile in game.nodes[node][0]:
+                if tile != game.robber_id[0]:
+                    if game.nodes[node][1][1] != "none" and game.nodes[node][1][1] != player.id:
+                        new_action = Action(ActionType.USE_KNIGHT, {Player.ActionData.ROBBER_TILE_ID: tile, Player.ActionData.ROBBER_PLAYER_TARGET: game.nodes[node][1][1]})
+                        if new_action not in actions:
+                            seen_tiles.add(tile)
+                            actions.append(new_action)
+
+        # Append tiles without adjacent players
+        for tile in (tiles - seen_tiles):
+            if tile != game.robber_id[0]:
+                new_action = Action(ActionType.USE_KNIGHT, {Player.ActionData.ROBBER_TILE_ID: tile, Player.ActionData.ROBBER_PLAYER_TARGET: "none"})
+                actions.append(new_action)
+
         return actions
+
 
 #def search_devcard_buildroad(player, game):
 
@@ -364,6 +384,7 @@ def search_move_robber(player, game):
     tiles = set(range(1, 20))
     seen_tiles = set()
 
+    # Append tiles with adjacent players
     for node in game.nodes:
         for tile in game.nodes[node][0]:
             if tile != game.robber_id[0]:
@@ -373,6 +394,7 @@ def search_move_robber(player, game):
                         seen_tiles.add(tile)
                         actions.append(new_action)
 
+    # Append tiles without adjacent players
     for tile in (tiles - seen_tiles):
         if tile != game.robber_id[0]:
             new_action = Action(ActionType.MOVE_ROBBER, {Player.ActionData.ROBBER_TILE_ID: tile, Player.ActionData.ROBBER_PLAYER_TARGET: "none"})
