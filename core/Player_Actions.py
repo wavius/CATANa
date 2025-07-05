@@ -4,15 +4,29 @@ import random
 import copy
 import Player
 import Game
-# --- = work in progress
 
 
 # ------------------------------
-# Execute action methods
+# General execute action method
+# ------------------------------
+"action_list = [Action(ActionType, dict)] -> action_list = search_all(player, game)"
+"Executes chosen action from action_list[action_index] by updating action_data then calling the correct execute action method through ACTIONS[action_type] dict"
+"Player turn: action_id = evaluation_actions(player, data) -> execute_action(action_list, action_id, player, game)"
+
+def execute_action(action_list: list, action_id: int, player: Player.Player, game: Game.Game):
+
+    action_type = action_list[action_id].type
+
+    for key, value in action_list[action_id].data:
+        player.action_data[key] = value
+
+    ACTIONS[action_type](player, game)
+
+# ------------------------------
+# Individual execute action methods
 # ------------------------------
 
-"Any data needed to execute a move is first updated in action_data dict in Player class"
-"Execute action methods are then called"
+"Any data needed to execute a move must first be updated in action_data dict in Player class -> Execute action methods can then be called"
 
 # Build
 def build_road(player, game):
@@ -181,11 +195,6 @@ ACTIONS = {
     # ActionType.END_TURN: end_turn
 }
 
-# Method to execute general action
-def execute_action(player, game, action_type):
-    ACTIONS[action_type](player, game)
-
-
 # ------------------------------
 # Search action methods
 # ------------------------------
@@ -195,7 +204,7 @@ def execute_action(player, game, action_type):
 "- Use development cards"
 "- Trade"
 "- Other"
-"Appends all actions to respective lists"
+"Each function returns all respective actions in a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]."
 
 # Dataclass to store action type and related action data for each action
 @dataclass
@@ -505,8 +514,9 @@ print("----------")
 
 
 list = search_all(p1, game)
-for item in list:
-    print(item)
+
+print(list[1].type)
+print(list[1].data)
 
 print("----------")
 
