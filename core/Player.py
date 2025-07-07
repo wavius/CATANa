@@ -31,6 +31,7 @@ class Player:
         self.development_cards = {
             # Development cards
             'knight': 0,
+            'used_knight': 0,
             'vic_point': 0,
             'build_road': 0,
             'year_of_plenty': 0,
