@@ -82,6 +82,7 @@ def buy_devcard(player, game):
 ##
 def use_devcard_knight(player, game):
     player.development_cards['knight'] -= 1
+    player.development_cards['used_knight'] += 1
     move_robber(player, game)
 
 def use_devcard_buildroad(player, game):
@@ -100,10 +101,10 @@ def use_devcard_yearofplenty(player, game):
 
 def use_devcard_monopoly(player, game):
     player.development_cards['monopoly'] -= 1
-    for item in game.players:
-        if item != player and item != 'none':
-            player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += item.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)]
-            item.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] = 0
+    for other_player in game.players:
+        if other_player != player and other_player != "none":
+            player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] += other_player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)]
+            other_player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] = 0
 
 # Trade
 def trade_bank(player, game):
@@ -481,6 +482,38 @@ def search_all(player, game):
     ]
 
 # ------------------------------
+# Additional methods
+# ------------------------------
+"Methods to check largest army and longest road"
+
+def check_largest_army(player, game):
+    if player.id == game.largest_army_player_id:
+        return
+    elif player.development_cards.get("used_knight") < 3:
+        return
+    elif game.largest_army_player_id == "none":
+        game.largest_army_player_id = player.id
+        player.vic_points += 2
+        return
+    else:
+        num = player.development_cards.get("used_knight")
+        for other_player in game.players:
+            if other_player.id != game.largest_army_player_id:
+                continue
+            elif num > other_player.development_cards.get("used_knight"):
+                game.largest_army_player_id = player.id
+                other_player.vic_points -= 2
+                player.vic_points += 2
+                return
+            elif num == other_player.development_cards.get("used_knight"):
+                game.largest_army_player_id = "none"
+                other_player.vic_points -= 2
+                return
+            else:
+                return
+
+    
+# ------------------------------
 # Test
 # ------------------------------
 
@@ -498,29 +531,24 @@ game.players[0].resource_cards['stone'] = 10
 game.players[0].resource_cards['wood'] = 10
 game.players[0].resource_cards['sheep'] = 10
 game.players[0].resource_cards['brick'] = 10
-game.players[0].development_cards['build_road'] = 10
+
+game.players[0].development_cards['used_knight'] = 3
+game.players[1].development_cards['used_knight'] = 5
 
 p1 = game.players[0]
 p2 = game.players[1]
 p3 = game.players[2]
 
-game.players[0].action_data[Player.ActionData.BUILD_NODE_ID] = 1
-game.players[0].resource_cards['wheat'] += 1
-
-
-game.edges[1][1] = p1.id
+check_largest_army(p2, game)
+check_largest_army(p1, game)
 
 print("----------")
 
-
-list = search_all(p1, game)
-
-print(list[1].type)
-print(list[1].data)
+print(game.largest_army_player_id)
+print(p1.development_cards.get('used_knight'))
 
 print("----------")
 
-print(len(list))
 
 
 
