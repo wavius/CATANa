@@ -84,6 +84,10 @@ class Game:
         # Generate player names
         self.players = self.generate_player_names()
 
+        # Store largest army and longest road
+        self.longest_road_player_id = "none"
+        self.largest_army_player_id = "none"
+
     # ----------------------------------------
     # Card List Generation
     # ----------------------------------------
