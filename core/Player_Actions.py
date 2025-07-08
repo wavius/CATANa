@@ -327,6 +327,24 @@ def search_devcard_knight(player, game):
         return actions
 
 def search_devcard_buildroad(player, game):
+
+    # Helper function that returns a set of valid edge ids for placing a road
+    def buildroad_helper(player, game):
+        # Edges owned by the player
+        owned_edges = [eid for eid, data in game.edges.items() if data[1] == player.id]
+
+        # Open edges adjacent to the player's roads
+        open_edges = set()
+        for id in owned_edges:
+            node1, node2 = game.edges[id][0]
+            for adj_id, adj_data in game.edges.items():
+                if adj_data[1] == "none" and adj_id != id:
+                    if node1 in adj_data[0] or node2 in adj_data[0]:
+                        open_edges.add(adj_id)
+
+        return open_edges
+
+
     actions = []
 
     if player.development_cards.get('build_road') < 1:
@@ -364,22 +382,6 @@ def search_devcard_buildroad(player, game):
                 actions.append(new_action)
 
         return actions
-
-# Helper function that returns a set of valid edge ids for placing a road
-def buildroad_helper(player, game):
-    # Edges owned by the player
-    owned_edges = [eid for eid, data in game.edges.items() if data[1] == player.id]
-
-    # Open edges adjacent to the player's roads
-    open_edges = set()
-    for id in owned_edges:
-        node1, node2 = game.edges[id][0]
-        for adj_id, adj_data in game.edges.items():
-            if adj_data[1] == "none" and adj_id != id:
-                if node1 in adj_data[0] or node2 in adj_data[0]:
-                    open_edges.add(adj_id)
-
-    return open_edges
 
 def search_devcard_yearofplenty(player, game):
     actions = []
@@ -512,7 +514,67 @@ def check_largest_army(player, game):
             else:
                 return
 
+def check_longest_road(player, game):
+    if player.id == game.longest_road_player_id:
+        return
+
+    # Build graph of the player's roads (edges)
+    adj = {}
+    for edge_id, (nodes, owner_id) in game.edges.items():
+        if owner_id != player.id:
+            continue
+        a, b = nodes
+
+        # Block roads passing through opponent buildings
+        for node in [a, b]:
+            building_owner = game.nodes[node][1][1]  # access owner from [port, owner, building]
+            if building_owner not in [None, "none", player.id]:
+                break  # skip this edge
+        else:
+            adj.setdefault(a, []).append((b, edge_id))
+            adj.setdefault(b, []).append((a, edge_id))
+
+    # Depth First Search to compute longest path without reusing edges or passing through opponent buildings
+    def dfs(node, visited_edges):
+        max_length = 0
+        for neighbor, edge_id in adj.get(node, []):
+            if edge_id in visited_edges:
+                continue
+            # Stop path if neighbor is blocked by opponent building
+            building_owner = game.nodes[neighbor][1][1]
+            if building_owner not in [None, "none", player.id]:
+                continue
+            visited_edges.add(edge_id)
+            max_length = max(max_length, 1 + dfs(neighbor, visited_edges))
+            visited_edges.remove(edge_id)
+        return max_length
+
+    longest = 0
+    for node in adj:
+        longest = max(longest, dfs(node, set()))
     
+    print("longest = ", longest)
+
+    if longest < 5:
+        return
+
+    if game.longest_road_player_id == "none":
+        game.longest_road_player_id = player.id
+        game.longest_road_length = longest
+        player.vic_points += 2
+        return
+
+    for other_player in game.players:
+        if other_player.id == game.longest_road_player_id:
+            if longest > game.longest_road_length:
+                game.longest_road_player_id = player.id
+                game.longest_road_length = longest
+                other_player.vic_points -= 2
+                player.vic_points += 2
+            return
+    
+    
+
 # ------------------------------
 # Test
 # ------------------------------
@@ -532,20 +594,16 @@ game.players[0].resource_cards['wood'] = 10
 game.players[0].resource_cards['sheep'] = 10
 game.players[0].resource_cards['brick'] = 10
 
-game.players[0].development_cards['used_knight'] = 3
-game.players[1].development_cards['used_knight'] = 5
+
 
 p1 = game.players[0]
 p2 = game.players[1]
 p3 = game.players[2]
-
-check_largest_army(p2, game)
-check_largest_army(p1, game)
+game.edges[1][1] = p1.id
 
 print("----------")
-
-print(game.largest_army_player_id)
-print(p1.development_cards.get('used_knight'))
+check_longest_road(p1,game)
+print(game.longest_road_length)
 
 print("----------")
 
