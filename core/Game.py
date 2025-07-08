@@ -86,7 +86,7 @@ class Game:
 
         # Store largest army and longest road
         self.longest_road_player_id = "none"
-        self.longest_road_length = int
+        self.longest_road_length = 0
         self.largest_army_player_id = "none"
 
     # ----------------------------------------
