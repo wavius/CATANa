@@ -7,12 +7,10 @@ import Game
 
 
 # ------------------------------
-# General execute action method
+# General methods
 # ------------------------------
-"action_list = [Action(ActionType, dict)] -> action_list = search_all(player, game)"
+"action_list: [Action(ActionType, dict)] -> action_list = search_all(player, game)"
 "Executes chosen action from action_list[action_index] by updating action_data then calling the correct execute action method through ACTIONS[action_type] dict"
-"Player turn: action_id = evaluation_actions(player, data) -> execute_action(action_list, action_id, player, game)"
-
 def execute_action(action_list: list, action_id: int, player: Player.Player, game: Game.Game):
 
     action_type = action_list[action_id].type
@@ -21,6 +19,30 @@ def execute_action(action_list: list, action_id: int, player: Player.Player, gam
         player.action_data[key] = value
 
     ACTIONS[action_type](player, game)
+
+
+"Checks and updates longest road and largest army"
+def check(player, game):
+    check_largest_army(player, game)
+    check_longest_road(player, game)
+
+
+"Searches for all available actions and returns a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]"
+def search_all(player, game):
+    # Flatten lists with * (unpacking operator) to get a clean list instead of a list of lists
+    return [
+        *search_build_road(player, game),
+        *search_build_settlement(player, game),
+        *search_build_city(player, game),
+        *search_buy_devcard(player, game),
+        *search_devcard_knight(player, game),
+        *search_devcard_buildroad(player, game),
+        *search_devcard_yearofplenty(player, game),
+        *search_devcard_monopoly(player, game),
+        *search_trade_bank(player, game),
+        *search_trade_port(player, game)
+    ]
+
 
 # ------------------------------
 # Individual execute action methods
@@ -126,7 +148,6 @@ def trade_port(player, game):
         player.resource_cards[player.action_data.get(Player.ActionData.RESOURCE_GET)] -= 1
 
 # Move robber
-##
 def move_robber(player, game):
     game.board[game.robber_id[0]][3] = False
     game.robber_id[0] = player.action_data.get(Player.ActionData.ROBBER_TILE_ID)
@@ -205,7 +226,7 @@ ACTIONS = {
 "- Use development cards"
 "- Trade"
 "- Other"
-"Each function returns all respective actions in a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]."
+"Each function returns all respective actions in a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]"
 
 # Dataclass to store action type and related action data for each action
 @dataclass
@@ -467,24 +488,9 @@ def search_move_robber(player, game):
 
     return actions
 
-# General search function to find all actions on player turn
-def search_all(player, game):
-    # Flatten lists with * (unpacking operator) to get a clean list instead of a list of lists
-    return [
-        *search_build_road(player, game),
-        *search_build_settlement(player, game),
-        *search_build_city(player, game),
-        *search_buy_devcard(player, game),
-        *search_devcard_knight(player, game),
-        *search_devcard_buildroad(player, game),
-        *search_devcard_yearofplenty(player, game),
-        *search_devcard_monopoly(player, game),
-        *search_trade_bank(player, game),
-        *search_trade_port(player, game)
-    ]
 
 # ------------------------------
-# Additional methods
+# Additional check methods
 # ------------------------------
 "Methods to check largest army and longest road"
 
@@ -569,12 +575,10 @@ def check_longest_road(player, game):
             if longest > game.longest_road_length:
                 game.longest_road_player_id = player.id
                 game.longest_road_length = longest
-                other_player.vic_points -= 2
+                
                 player.vic_points += 2
             return
     
-    
-
 # ------------------------------
 # Test
 # ------------------------------
