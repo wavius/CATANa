@@ -28,7 +28,7 @@ def check(player, game):
 
 
 "Searches for all available actions and returns a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]"
-def search_all(player, game):
+def search_action(player, game):
     # Flatten lists with * (unpacking operator) to get a clean list instead of a list of lists
     return [
         *search_build_road(player, game),
