@@ -48,8 +48,6 @@ def search_all(player, game):
 # Individual execute action methods
 # ------------------------------
 
-"Any data needed to execute a move must first be updated in action_data dict in Player class -> Execute action methods can then be called"
-
 # Build
 def build_road(player, game):
     player.resource_cards['wood'] -= 1
@@ -101,7 +99,6 @@ def buy_devcard(player, game):
         player.vic_points += 1
 
 # Use development cards
-##
 def use_devcard_knight(player, game):
     player.development_cards['knight'] -= 1
     player.development_cards['used_knight'] += 1
@@ -169,10 +166,8 @@ def move_robber(player, game):
         for item in card_list:
             target_player.resource_cards[item] += 1
 
-# ------------------------------
 # End turn ---
 # Trade player ---
-# ------------------------------
 
 # Enumeration for all possible actions
 class ActionType(Enum):
@@ -217,10 +212,10 @@ ACTIONS = {
     # ActionType.END_TURN: end_turn
 }
 
+
 # ------------------------------
 # Search action methods
 # ------------------------------
-
 "Searches for all available moves in categories:"
 "- Build/Buy"
 "- Use development cards"
@@ -228,7 +223,7 @@ ACTIONS = {
 "- Other"
 "Each function returns all respective actions in a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]"
 
-# Dataclass to store action type and related action data for each action
+# Dataclass to store action type and related action data
 @dataclass
 class Action:
     type: ActionType
@@ -578,11 +573,11 @@ def check_longest_road(player, game):
                 
                 player.vic_points += 2
             return
-    
+
+
 # ------------------------------
 # Test
 # ------------------------------
-
 
 game = Game.Game()
 
@@ -610,38 +605,3 @@ check_longest_road(p1,game)
 print(game.longest_road_length)
 
 print("----------")
-
-
-
-
-
-
-
-
-
-
-
-
-
-#game.nodes[1][2][1][2] = 'settlement'
-
-#test = search_build_city(p1,game)
-
-#for item in test:
-#    print(item)
-
-
-
-
-
-#list = []
-#new_action = Action(ActionType.BUILD_CITY, {Player.ActionData.BUILD_EDGE_ID: 99, Player.ActionData.BUILD_EDGE_EXTRA_ID: 99})
-#list.append(new_action)
-
-# Assigning action_data from action in list
-# for item in list:
-#    for key in item.data.keys():
-#        p1.action_data[key] = item.data.get(key)
-    
-#for data in p1.action_data:
-#    print(p1.action_data.get(data))
