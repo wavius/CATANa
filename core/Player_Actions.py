@@ -43,10 +43,64 @@ def search_action(player, game):
         *search_trade_port(player, game)
     ]
 
+"Searches for all available actions on TURNS 1 & 2 and returns a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]"
+def search_start_turns(player, game):
+    actions = []
+   
+    # Get a list of owned edges
+    owned_edges = []
+    for key, data in game.edges.items():
+        if data[1] == player.id:
+            owned_edges.append(key)
+        
+     # Get a list of open nodes adjacent to owned edges
+    open_nodes = set(range(1, 55))
+
+    for node in game.nodes:
+        if game.nodes[node][1][1] != "none":
+            open_nodes.remove(node)
+    
+    # Add code to remove nodes that are adjacent to occupied nodes
+    ####
+    
+    for node in open_nodes:
+        for edge in game.edges:
+            if node in game.edges[edge][0] and game.edges[edge][1] == "none":
+                new_action = Action(ActionType.START_TURNS, {Player.ActionData.BUILD_NODE_ID: node, Player.ActionData.BUILD_EDGE_ID: edge})
+                actions.append(new_action)
+
+    return actions
+
 
 # ------------------------------
 # Individual execute action methods
 # ------------------------------
+
+# Start turns
+def start_turns(player, game):
+    # Turn 1
+    if player.pieces.get("settlements") == 5:
+        player.pieces['roads'] -= 1
+        game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1] = player.id
+
+        player.vic_points += 1
+        player.pieces['settlements'] -= 1
+        game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][1] = player.id
+        game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
+
+    # Turn 2
+    else:
+        player.pieces['roads'] -= 1
+        game.edges[player.action_data.get(Player.ActionData.BUILD_EDGE_ID)][1] = player.id
+
+        player.vic_points += 1
+        player.pieces['settlements'] -= 1
+        game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][1] = player.id
+        game.nodes[player.action_data.get(Player.ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
+
+        # Get resources from tiles adjacent to BUILD_NODE
+        for tile in game.nodes[Player.ActionData.BUILD_NODE_ID][0]:
+            player.resource_cards[game.board[tile][0]] += 1
 
 # Build
 def build_road(player, game):
@@ -171,6 +225,9 @@ def move_robber(player, game):
 
 # Enumeration for all possible actions
 class ActionType(Enum):
+    # Start turns actions
+    START_TURNS = "start_turns"
+
     # Buy actions
     BUILD_ROAD = "build_road"
     BUILD_SETTLEMENT = "build_settlement"
@@ -194,6 +251,8 @@ class ActionType(Enum):
 
 # Defining enumerations to match the action methods
 ACTIONS = {
+    ActionType.START_TURNS: start_turns,
+
     ActionType.BUILD_ROAD: build_road,
     ActionType.BUILD_SETTLEMENT: build_settlement,
     ActionType.BUILD_CITY: build_city,
@@ -598,10 +657,12 @@ game.players[0].resource_cards['brick'] = 10
 p1 = game.players[0]
 p2 = game.players[1]
 p3 = game.players[2]
-game.edges[1][1] = p1.id
 
 print("----------")
-check_longest_road(p1,game)
-print(game.longest_road_length)
+list = search_start_turns(p1, game)
+for item in list:
+    print(item)
 
 print("----------")
+
+print(len(list))
