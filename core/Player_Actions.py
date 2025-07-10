@@ -22,7 +22,7 @@ def execute_action(action_list: list, action_id: int, player: Player.Player, gam
 
 
 "Checks and updates longest road and largest army"
-def check(player, game):
+def check_bonuses(player, game):
     check_largest_army(player, game)
     check_longest_road(player, game)
 
@@ -44,7 +44,7 @@ def search_action(player, game):
     ]
 
 "Searches for all available actions on TURNS 1 & 2 and returns a list: [Action(ActionType.ACTION, {Player.ActionData.DATA1: data1, ...}]"
-def search_start_turns(player, game):
+def search_action_start_turns(player, game):
     actions = []
    
     # Get a list of owned edges
