@@ -669,7 +669,7 @@ p3 = game.players[2]
 game.nodes[1][1][1] = p1.id
 
 print("----------")
-list = search_start_turns(p1, game)
+list = search_action_start_turns(p1, game)
 for item in list:
     print(item)
 
