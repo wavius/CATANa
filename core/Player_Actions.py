@@ -53,15 +53,23 @@ def search_start_turns(player, game):
         if data[1] == player.id:
             owned_edges.append(key)
         
-     # Get a list of open nodes adjacent to owned edges
+     # Get a list of open nodes adjacent to owned edgescxbv 
     open_nodes = set(range(1, 55))
+    occupied_nodes = set()
 
     for node in game.nodes:
         if game.nodes[node][1][1] != "none":
             open_nodes.remove(node)
+            occupied_nodes.add(node)
+            
     
-    # Add code to remove nodes that are adjacent to occupied nodes
-    ####
+    # Remove nodes that are adjacent to occupied nodes
+    for node in occupied_nodes:
+        for edge in game.edges:
+            if node in game.edges[edge][0]:
+                for unav_node in game.edges[edge][0]:
+                    if unav_node in open_nodes:
+                        open_nodes.remove(unav_node)
     
     for node in open_nodes:
         for edge in game.edges:
@@ -657,6 +665,8 @@ game.players[0].resource_cards['brick'] = 10
 p1 = game.players[0]
 p2 = game.players[1]
 p3 = game.players[2]
+
+game.nodes[1][1][1] = p1.id
 
 print("----------")
 list = search_start_turns(p1, game)
