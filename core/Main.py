@@ -1,5 +1,6 @@
 import Game
 import Player
+from Actions import *
 
 # Initialize game
 game = Game.Game()
@@ -27,16 +28,40 @@ print("-----------------starting game-----------------") #debug only
 while net_turn < 2:
     if game_turn == 0:
         # Player 1's turn (start turns)
-        pass
+        action_list = search_action_start_turns(p1, game)
+
+        # AI evaluation method goes here
+        action_id = int
+
+        execute_action(action_list, action_id, p1, game)
+
     elif game_turn == 1:
         # Player 2's turn (start turns)
-        pass
+        action_list = search_action_start_turns(p2, game)
+
+        # AI evaluation method goes here
+        action_id = int
+
+        execute_action(action_list, action_id, p2, game)
+
     elif game_turn == 2:
         # Player 3's turn (start turns)
-        pass
+        action_list = search_action_start_turns(p3, game)
+
+        # AI evaluation method goes here
+        action_id = int
+
+        execute_action(action_list, action_id, p3, game)
+
     elif game_turn == 3:
         # Player 4's turn (start turns)
-        pass
+        action_list = search_action_start_turns(p4, game)
+
+        # AI evaluation method goes here
+        action_id = int
+
+        execute_action(action_list, action_id, p4, game)
+
     else:
         print("Error: Invalid game turn number.")
     
@@ -63,78 +88,49 @@ while net_turn < 2:
 while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 75 and net_turn >= 2:
     print("----------------------------------") #debug only
     if game_turn == 0:
-        roll_value, current_roll = game.roll_dice()
-        if current_roll == ["robber"]:
+        current_roll = game.roll_dice()
+        if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            # Awarding resources to players based on the roll
-            valid_nodes = current_roll
-            for node_id in valid_nodes:
-                touching_tiles, (port, owner, building) = game.nodes[node_id]
-                # for each adjacent tile that rolled this turn:
-                for tile_id in touching_tiles:
-                    resource, token, dots, has_robber = game.board[tile_id]
-                    if not has_robber and token == roll_value:
-                        qty = 2 if building == "city" else 1
-                        game.award_resource(owner, resource, qty)
-            # Player 1's turn
-
+            valid_hexes = current_roll
+            # Player 1's turn 
         pass
     elif game_turn == 1:
-        roll_value, current_roll = game.roll_dice()
-        if current_roll == ["robber"]:
+        current_roll = game.roll_dice()
+        if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            # Awarding resources to players based on the roll
-            valid_nodes = current_roll
-            for node_id in valid_nodes:
-                touching_tiles, (port, owner, building) = game.nodes[node_id]
-                # for each adjacent tile that rolled this turn:
-                for tile_id in touching_tiles:
-                    resource, token, dots, has_robber = game.board[tile_id]
-                    if not has_robber and token == roll_value:
-                        qty = 2 if building == "city" else 1
-                        game.award_resource(owner, resource, qty)
-            
+            valid_hexes = current_roll
             # Player 2's turn 
-        pass
+            p2.turn = True
+            while p2.turn == True:
+                action_list = search_action(p2, game)
+
+                # AI evaluation method goes here
+                action_id = int
+
+                execute_action(action_list, action_id, p2, game)
+
     elif game_turn == 2:
-        roll_value, current_roll = game.roll_dice()
-        if current_roll == ["robber"]:
+        current_roll = game.roll_dice()
+        if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            # Awarding resources to players based on the roll
-            valid_nodes = current_roll
-            for node_id in valid_nodes:
-                touching_tiles, (port, owner, building) = game.nodes[node_id]
-                # for each adjacent tile that rolled this turn:
-                for tile_id in touching_tiles:
-                    resource, token, dots, has_robber = game.board[tile_id]
-                    if not has_robber and token == roll_value:
-                        qty = 2 if building == "city" else 1
-                        game.award_resource(owner, resource, qty)
+            valid_hexes = current_roll
             # Player 3's turn 
         pass
     elif game_turn == 3:
-        roll_value, current_roll = game.roll_dice()
-        if current_roll == ["robber"]:
+        current_roll = game.roll_dice()
+        if current_roll == "robber":
             #robber turn code
             pass 
         else:
-            # Awarding resources to players based on the roll
-            valid_nodes = current_roll
-            for node_id in valid_nodes:
-                touching_tiles, (port, owner, building) = game.nodes[node_id]
-                # for each adjacent tile that rolled this turn:
-                for tile_id in touching_tiles:
-                    resource, token, dots, has_robber = game.board[tile_id]
-                    if not has_robber and token == roll_value:
-                        qty = 2 if building == "city" else 1
-                        game.award_resource(owner, resource, qty) 
-            # Player 4's turn 
+            valid_hexes = current_roll
+            # Player 1's turn 
+        # Player 4's turn 
         pass
     else:
         print("Error: Invalid game turn number. (start turns)")
