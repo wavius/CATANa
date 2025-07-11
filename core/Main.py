@@ -80,11 +80,12 @@ while net_turn < 2:
         game_turn -= 1
         if game_turn < 0:
             net_turn = 2
+            game_turn = 0
             print("End of start turns, starting game turns now.") #debug only
 
 
 # Game loop
-while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 200 and net_turn >= 2:
+while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 75 and net_turn >= 2:
     print("----------------------------------") #debug only
     if game_turn == 0:
         current_roll = game.roll_dice()
@@ -144,7 +145,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 check_bonuses(p1, game)
         else:
             valid_hexes = current_roll
-            
             # Player 2's turn 
             p2.turn = True
             while p2.turn == True:
@@ -228,7 +228,7 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
 
     else:
         print("Error: Invalid game turn number. (start turns)")
-        
+    print(current_roll) #debug only   
     #turn ticker
     print("End of turn ", net_turn, " for player ", game_turn + 1)
     game_turn += 1
