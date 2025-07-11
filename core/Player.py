@@ -20,7 +20,7 @@ class ActionData(Enum):
 class Player:
     def __init__(self, player_id):
         self.id = player_id
-        self.turn = False
+        self.turn = True
         self.resource_cards = {
             # Resource cards
             'brick': 0,
