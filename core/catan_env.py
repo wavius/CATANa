@@ -2,6 +2,7 @@ import gymnasium as gym
 import numpy as np
 from Game import Game
 from Actions import search_action, execute_action, ActionType
+import Player
 
 class CatanEnv(gym.Env):
     def __init__(self):
