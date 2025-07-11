@@ -228,7 +228,10 @@ def move_robber(player, game):
         for item in card_list:
             target_player.resource_cards[item] += 1
 
-# End turn ---
+# End turn
+def end_turn(player, game):
+    player.turn = False
+
 # Trade player ---
 
 # Enumeration for all possible actions
@@ -276,7 +279,7 @@ ACTIONS = {
     # ActionType.TRADE_PLAYER: trade_player,
 
     ActionType.MOVE_ROBBER: move_robber,
-    # ActionType.END_TURN: end_turn
+    ActionType.END_TURN: end_turn
 }
 
 
@@ -549,6 +552,9 @@ def search_move_robber(player, game):
             actions.append(new_action)
 
     return actions
+
+def search_end_turn(player, game):
+    return [Action(ActionType.END_TURN, {})]
 
 
 # ------------------------------
