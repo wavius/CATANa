@@ -1,6 +1,6 @@
 import Game
 import Player
-from Player_Actions import *
+from Actions import *
 
 # Initialize game
 game = Game.Game()

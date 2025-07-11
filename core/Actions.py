@@ -652,33 +652,33 @@ def check_longest_road(player, game):
 # Test
 # ------------------------------
 
-game = Game.Game()
+#game = Game.Game()
 
-game.players[0] = Player.Player(game.players[0])
-game.players[1] = Player.Player(game.players[1])
-game.players[2] = Player.Player(game.players[2])
-game.players[3] = Player.Player(game.players[3])
-
-
-game.players[0].resource_cards['wheat'] = 10
-game.players[0].resource_cards['stone'] = 10
-game.players[0].resource_cards['wood'] = 10
-game.players[0].resource_cards['sheep'] = 10
-game.players[0].resource_cards['brick'] = 10
+#game.players[0] = Player.Player(game.players[0])
+#game.players[1] = Player.Player(game.players[1])
+#game.players[2] = Player.Player(game.players[2])
+#game.players[3] = Player.Player(game.players[3])
 
 
+#game.players[0].resource_cards['wheat'] = 10
+#game.players[0].resource_cards['stone'] = 10
+#game.players[0].resource_cards['wood'] = 10
+#game.players[0].resource_cards['sheep'] = 10
+#game.players[0].resource_cards['brick'] = 10
 
-p1 = game.players[0]
-p2 = game.players[1]
-p3 = game.players[2]
 
-game.nodes[1][1][1] = p1.id
 
-print("----------")
-list = search_action_start_turns(p1, game)
-for item in list:
-    print(item)
+#p1 = game.players[0]
+#p2 = game.players[1]
+#p3 = game.players[2]
 
-print("----------")
+#game.nodes[1][1][1] = p1.id
 
-print(len(list))
+#print("----------")
+#list = search_action_start_turns(p1, game)
+#for item in list:
+#    print(item)
+
+#print("----------")
+
+#print(len(list))
