@@ -1,8 +1,8 @@
 import gymnasium as gym
 import numpy as np
-from Game import Game
-from Actions import search_action, execute_action, ActionType
-import Player
+from core.game import Game
+from core.actions import search_action, execute_action, ActionType
+import core.player
 
 class CatanEnv(gym.Env):
     def __init__(self):
@@ -29,7 +29,7 @@ class CatanEnv(gym.Env):
         self.game = Game()
         # assign Player instances (your existing init logic in Main.py)
         for i in range(4):
-            self.game.players[i] = Player.Player(self.game.players[i])
+            self.game.players[i] = core.player.Player(self.game.players[i])
         self.current_player = 0
 
         # run the “start turns” phases automatically if you like,

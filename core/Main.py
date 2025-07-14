@@ -1,15 +1,15 @@
-import Game
-import Player
-from Actions import *
+import game
+from player import Player
+from actions import *
 
 # Initialize game
-game = Game.Game()
+game = game.Game()
 
 # Initialize players
-game.players[0] = Player.Player(game.players[0])
-game.players[1] = Player.Player(game.players[1])
-game.players[2] = Player.Player(game.players[2])
-game.players[3] = Player.Player(game.players[3])
+game.players[0] = Player(game.players[0])
+game.players[1] = Player(game.players[1])
+game.players[2] = Player(game.players[2])
+game.players[3] = Player(game.players[3])
 
 p1 = game.players[0]
 p2 = game.players[1]
