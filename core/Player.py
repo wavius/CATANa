@@ -2,6 +2,9 @@ from enum import Enum
 
 # Enumerate ActionData
 class ActionData(Enum):
+    """
+    A class containining action enums
+    """
     BUILD_NODE_ID = "build_node_id"
     BUILD_EDGE_ID = "build_edge_id"
     BUILD_EDGE_EXTRA_ID = "build_edge_extra_id"
@@ -12,12 +15,22 @@ class ActionData(Enum):
 
     TARGET_PLAYER = "target_player"
     PORT = "port"
-    SPECIAL_RESOURCE_GIVE = "special_resource_give"
 
     ROBBER_TILE_ID = "robber_tile_id"
     ROBBER_PLAYER_TARGET = "robber_player_target"
 
 class Player:
+    """
+    A class containining player information:
+      - Player ID
+      - Turn
+      - Resource cards
+      - Development cards
+      - Victory points
+      - Pieces
+      - Action data
+    """
+
     def __init__(self, player_id):
         self.id = player_id
         self.turn = True
