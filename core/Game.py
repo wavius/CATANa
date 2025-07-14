@@ -4,7 +4,7 @@ import random
 
 class Game:
     """
-    A class containining the components of a Settlers of Catan game:
+    A class containining the components of a Settlers of Catan game: 
       - Development card deck
       - Resource card decks
       - Hex board layout with tokens and robber

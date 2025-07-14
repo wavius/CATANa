@@ -7,7 +7,7 @@ import game
 
 
 # ------------------------------
-# General methods
+# General functions
 # ------------------------------
 def execute_action(action_list: list, action_id: int, player: Player, game: game.Game):
     """
@@ -85,7 +85,7 @@ def search_action_start_turns(player, game):
     return actions
 
 # ------------------------------
-# Individual execute action methods
+# Individual execute action functions
 # ------------------------------
 # Start turns
 def start_turns(player, game):
@@ -327,7 +327,7 @@ ACTIONS = {
 }
 
 # ------------------------------
-# Search action methods
+# Search action functions
 # ------------------------------
 @dataclass
 class Action:
@@ -630,7 +630,7 @@ def search_end_turn(player, game):
     return [Action(ActionType.END_TURN, {})]
 
 # ------------------------------
-# Additional check methods
+# Additional check functions
 # ------------------------------
 def check_largest_army(player, game):
     "Checks and updates largest army bonus"
