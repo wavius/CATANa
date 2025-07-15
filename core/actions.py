@@ -37,7 +37,7 @@ def search_action(player, game):
             if data[1] == player.id:
                 owned_edges.append(key)
             
-        # Get a list of open nodes adjacent to owned edgescxbv 
+        # Get a list of open nodes adjacent to owned edges
         open_nodes = set(range(1, 55))
         occupied_nodes = set()
 
@@ -76,12 +76,6 @@ def search_action(player, game):
             *search_trade_bank(player, game),
             *search_trade_port(player, game)
     ]
-
-def search_action_start_turns(player, game):
-    """
-    Searches for all available actions on TURNS 1 & 2 and returns a list: [Action(ActionType.ACTION, {ActionData.DATA1: data1, ...}]
-    """
-    
 
 # ------------------------------
 # Individual execute action functions
