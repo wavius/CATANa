@@ -74,9 +74,10 @@ class Game:
         self.development_cards = self.generate_development_cards()
         self.resource_cards = self.generate_resource_cards()
 
-        # Generate board tiles + store robber tile id
+        # Generate board tiles + store robber tile id + turn number
         self.robber_id = [0]
         self.board = self.generate_board(self.robber_id)
+        self.turn = 0
 
         # Static definitions for vertices and edges
         self.nodes = self.create_nodes()
