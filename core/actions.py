@@ -21,10 +21,6 @@ def execute_action(action_list: list, action_id: int, player: Player, game: game
 
     ACTIONS[action_type](player, game)
 
-def check_bonuses(player, game):
-    """
-    Checks and updates longest road and largest army
-    """
     check_largest_army(player, game)
     check_longest_road(player, game)
 
@@ -32,57 +28,60 @@ def search_action(player, game):
     """
     Searches for all available actions and returns a list: [Action(ActionType.ACTION, {ActionData.DATA1: data1, ...}]
     """
-    # Flatten lists with * (unpacking operator) to get a clean list instead of a list of lists
-    return [
-        *search_build_road(player, game),
-        *search_build_settlement(player, game),
-        *search_build_city(player, game),
-        *search_buy_devcard(player, game),
-        *search_devcard_knight(player, game),
-        *search_devcard_buildroad(player, game),
-        *search_devcard_yearofplenty(player, game),
-        *search_devcard_monopoly(player, game),
-        *search_trade_bank(player, game),
-        *search_trade_port(player, game)
+    if game.net_turn <= 2:
+        actions = []
+    
+        # Get a list of owned edges
+        owned_edges = []
+        for key, data in game.edges.items():
+            if data[1] == player.id:
+                owned_edges.append(key)
+            
+        # Get a list of open nodes adjacent to owned edgescxbv 
+        open_nodes = set(range(1, 55))
+        occupied_nodes = set()
+
+        for node in game.nodes:
+            if game.nodes[node][1][1] != "none":
+                open_nodes.remove(node)
+                occupied_nodes.add(node)
+                
+        # Remove nodes that are adjacent to occupied nodes
+        for node in occupied_nodes:
+            for edge in game.edges:
+                if node in game.edges[edge][0]:
+                    for unav_node in game.edges[edge][0]:
+                        if unav_node in open_nodes:
+                            open_nodes.remove(unav_node)
+        
+        for node in open_nodes:
+            for edge in game.edges:
+                if node in game.edges[edge][0] and game.edges[edge][1] == "none":
+                    new_action = Action(ActionType.START_TURNS, {ActionData.BUILD_NODE_ID: node, ActionData.BUILD_EDGE_ID: edge})
+                    actions.append(new_action)
+
+        return actions
+
+    else:
+        # Flatten lists with * (unpacking operator) to get a clean list instead of a list of lists
+        return [
+            *search_build_road(player, game),
+            *search_build_settlement(player, game),
+            *search_build_city(player, game),
+            *search_buy_devcard(player, game),
+            *search_devcard_knight(player, game),
+            *search_devcard_buildroad(player, game),
+            *search_devcard_yearofplenty(player, game),
+            *search_devcard_monopoly(player, game),
+            *search_trade_bank(player, game),
+            *search_trade_port(player, game)
     ]
 
 def search_action_start_turns(player, game):
     """
     Searches for all available actions on TURNS 1 & 2 and returns a list: [Action(ActionType.ACTION, {ActionData.DATA1: data1, ...}]
     """
-    actions = []
-   
-    # Get a list of owned edges
-    owned_edges = []
-    for key, data in game.edges.items():
-        if data[1] == player.id:
-            owned_edges.append(key)
-        
-     # Get a list of open nodes adjacent to owned edgescxbv 
-    open_nodes = set(range(1, 55))
-    occupied_nodes = set()
-
-    for node in game.nodes:
-        if game.nodes[node][1][1] != "none":
-            open_nodes.remove(node)
-            occupied_nodes.add(node)
-            
     
-    # Remove nodes that are adjacent to occupied nodes
-    for node in occupied_nodes:
-        for edge in game.edges:
-            if node in game.edges[edge][0]:
-                for unav_node in game.edges[edge][0]:
-                    if unav_node in open_nodes:
-                        open_nodes.remove(unav_node)
-    
-    for node in open_nodes:
-        for edge in game.edges:
-            if node in game.edges[edge][0] and game.edges[edge][1] == "none":
-                new_action = Action(ActionType.START_TURNS, {ActionData.BUILD_NODE_ID: node, ActionData.BUILD_EDGE_ID: edge})
-                actions.append(new_action)
-
-    return actions
 
 # ------------------------------
 # Individual execute action functions
