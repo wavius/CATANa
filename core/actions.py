@@ -202,8 +202,8 @@ def use_devcard_yearofplenty(player, game):
     """
     player.development_cards['year_of_plenty'] -= 1
 
-    player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
-    player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET_EXTRA)] -= 1
+    game.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
+    game.resource_cards[player.action_data.get(ActionData.RESOURCE_GET_EXTRA)] -= 1
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] += 1
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET_EXTRA)] += 1
 
@@ -223,9 +223,9 @@ def trade_bank(player, game):
     Trade 4 of ActionData.RESOURCE_GIVE with bank to get 1 of ActionData.RESOURCE_GET
     """
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] -= 4
+    game.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 4
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] += 1
-    player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 4
-    player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
+    game.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
 
 def trade_port(player, game):
     """
@@ -233,19 +233,16 @@ def trade_port(player, game):
     """
     if player.action_data.get(ActionData.PORT) == '3:1':
         player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] -= 3
+        game.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 3
         player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] += 1
-        player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 3
-        player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
+        game.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
     else:
         player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] -= 2
+        game.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 2
         player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] += 1
-        player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 2
-        player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
+        game.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
 
 # Move robber
-    """
-    Trade 2 or 3 of ActionData.RESOURCE_GIVE with port to get 1 of ActionData.RESOURCE_GET 
-    """
 
 def move_robber(player, game):
     """
@@ -488,7 +485,7 @@ def search_devcard_buildroad(player, game):
 
     actions = []
 
-    if player.development_cards.get('build_road') < 1:
+    if player.development_cards.get('build_road') < 2:
         return actions
     else:
          # Get a set of owned nodes
@@ -532,10 +529,11 @@ def search_devcard_yearofplenty(player, game):
     if player.development_cards.get('year_of_plenty') < 1:
         return actions
     else:
-        for items in player.resource_cards.items():
-            for items_extra in player.resource_cards.items():
-                new_action = Action(ActionType.USE_YEAROFPLENTY, {ActionData.RESOURCE_GET: items[0], ActionData.RESOURCE_GET_EXTRA: items_extra[0]})
-                actions.append(new_action)
+        for item in player.resource_cards.items():
+            for item_extra in player.resource_cards.items():
+                if game.resource_cards.get(item[0]) > 1 and game.resource_cards.get(item_extra[0]) > 1:
+                    new_action = Action(ActionType.USE_YEAROFPLENTY, {ActionData.RESOURCE_GET: item[0], ActionData.RESOURCE_GET_EXTRA: item_extra[0]})
+                    actions.append(new_action)
         return actions
 
 def search_devcard_monopoly(player, game):
@@ -559,7 +557,7 @@ def search_trade_bank(player, game):
     for item in player.resource_cards.items():
         if item[1] >= 4:
             for item_extra in player.resource_cards.items():
-                if item[0] != item_extra[0]:
+                if item[0] != item_extra[0] and game.resource_cards.get(item_extra[0]) > 1:
                     new_action = Action(ActionType.TRADE_BANK, {ActionData.RESOURCE_GIVE: item[0], ActionData.RESOURCE_GET: item_extra[0]})
                     actions.append(new_action)
     return actions
@@ -583,7 +581,7 @@ def search_trade_port(player, game):
         for item in player.resource_cards.items():
             if item[1] >= 3:
                 for item_extra in player.resource_cards.items():
-                    if item[0] != item_extra[0]:
+                    if item[0] != item_extra[0] and game.resource_cards.get(item_extra[0]) > 1:
                         new_action = Action(ActionType.TRADE_PORT, {ActionData.RESOURCE_GIVE: item[0], ActionData.RESOURCE_GET: item_extra[0]})
                         actions.append(new_action)
 
@@ -591,7 +589,7 @@ def search_trade_port(player, game):
     for port in owned_ports:
         if port != "3:1" and player.resource_cards.get(port) >= 2:
             for item in player.resource_cards.items():
-                    if port != item[0]:
+                    if port != item[0] and game.resource_cards.get(item[0]) > 1:
                         new_action = Action(ActionType.TRADE_PORT, {ActionData.RESOURCE_GIVE: port, ActionData.RESOURCE_GET: item[0]})
                         actions.append(new_action)
 
