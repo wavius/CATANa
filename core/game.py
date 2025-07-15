@@ -153,13 +153,39 @@ class Game:
     # ----------------------------------------
     def roll_dice(self):
         """
-        Simulate rolling two dice and returns list of valid Node IDs, which are nodes that are intersected 
-        with the rolled hexes, and have a player settlement or city on them.
+        Simulate rolling two dice.
+        
+        Awards resources for nodes that are intersected with the rolled hexes and have a player settlement or city on them.
         
         Returns "robber" if a 7 is rolled.
         """
+
+        # Helper method
+        def award_resource(self, owner, resource, amount=1):
+            """
+            Take `amount` of `resource` cards from the bank and give them to `owner`.
+
+            Args:
+                owner    : a Player instance (just needs a .resource_cards dict)
+                resource : str, one of "brick", "wood", "sheep", "wheat", "stone"
+                amount   : int, how many cards to transfer
+            """
+            # 1) sanity‐check the bank
+            if resource not in self.resource_cards:
+                raise KeyError(f"Unknown resource '{resource}' in bank.")
+            if self.resource_cards[resource] < amount:
+                raise ValueError(
+                    f"Bank is out of {resource}! "
+                    f"(has {self.resource_cards[resource]}, needs {amount})"
+                )
+
+            # 2) remove from bank
+            self.resource_cards[resource] -= amount
+
+            # 3) deposit into player’s hand
+            owner.resource_cards[resource] += amount
+
         valid_hexs = []
-        valid_nodes = []
         die1 = random.randint(1, 6)
         die2 = random.randint(1, 6)
         total_roll = die1 + die2
@@ -177,35 +203,15 @@ class Game:
             for node_id, node_data in self.nodes.items():
                touching_tiles, (port, owner, building) = node_data
                if tile_id in touching_tiles and owner != "none":
-                    valid_nodes.append(node_id)
-        return total_roll, valid_nodes
-    
-    # ----------------------------------------
-    # Give resources to players based on rolled nodes
-    # ----------------------------------------
-    def award_resource(self, owner, resource, amount=1):
-        """
-        Take `amount` of `resource` cards from the bank and give them to `owner`.
+                    for p in self.players:
+                        if p.player_id == owner:
+                            if building == "settlement":
+                                award_resource(self, p, self.board[tile_id], amount=1)
+                            else:
+                                award_resource(self, p, self.board[tile_id], amount=2)
 
-        Args:
-            owner    : a Player instance (just needs a .resource_cards dict)
-            resource : str, one of "brick", "wood", "sheep", "wheat", "stone"
-            amount   : int, how many cards to transfer
-        """
-        # 1) sanity‐check the bank
-        if resource not in self.resource_cards:
-            raise KeyError(f"Unknown resource '{resource}' in bank.")
-        if self.resource_cards[resource] < amount:
-            raise ValueError(
-                f"Bank is out of {resource}! "
-                f"(has {self.resource_cards[resource]}, needs {amount})"
-            )
 
-        # 2) remove from bank
-        self.resource_cards[resource] -= amount
-
-        # 3) deposit into player’s hand
-        owner.resource_cards[resource] += amount
+        return total_roll
 
     # ----------------------------------------
     # Node (vertex) definitions
