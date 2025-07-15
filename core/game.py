@@ -77,7 +77,8 @@ class Game:
         # Generate board tiles + store robber tile id + turn number
         self.robber_id = [0]
         self.board = self.generate_board(self.robber_id)
-        self.turn = 0
+        self.net_turn = 0
+        self.current_turn = 0
 
         # Static definitions for vertices and edges
         self.nodes = self.create_nodes()
@@ -199,6 +200,8 @@ class Game:
                 if token == total_roll and not has_robber:
                     valid_hexs.append(tile_id)
         
+
+        # Award resources to players
         for tile_id in valid_hexs:
             for node_id, node_data in self.nodes.items():
                touching_tiles, (port, owner, building) = node_data
@@ -209,8 +212,6 @@ class Game:
                                 award_resource(self, p, self.board[tile_id], amount=1)
                             else:
                                 award_resource(self, p, self.board[tile_id], amount=2)
-
-
         return total_roll
 
     # ----------------------------------------
