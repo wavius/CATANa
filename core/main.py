@@ -97,7 +97,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
             action_id = int
 
             execute_action(action_list, action_id, p1, game)
-            check_bonuses(p1, game)
 
             p1.turn = True
             while p1.turn == True:
@@ -107,7 +106,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p1, game)
-                check_bonuses(p1, game)
         else:
             valid_hexes = current_roll
 
@@ -120,7 +118,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p1, game)
-                check_bonuses(p1, game)
 
     elif game_turn == 1:
         current_roll = game.roll_dice()
@@ -132,7 +129,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
             action_id = int
 
             execute_action(action_list, action_id, p2, game)
-            check_bonuses(p1, game)
 
             p2.turn = True
             while p2.turn == True:
@@ -142,7 +138,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p2, game)
-                check_bonuses(p1, game)
         else:
             valid_hexes = current_roll
             # Player 2's turn 
@@ -154,7 +149,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p2, game)
-                check_bonuses(p1, game)
 
     elif game_turn == 2:
         current_roll = game.roll_dice()
@@ -166,7 +160,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
             action_id = int
 
             execute_action(action_list, action_id, p3, game)
-            check_bonuses(p1, game)
 
             p3.turn = True
             while p3.turn == True:
@@ -176,7 +169,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p3, game)
-                check_bonuses(p1, game)
         else:
             valid_hexes = current_roll
 
@@ -189,7 +181,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p3, game)
-                check_bonuses(p1, game)
 
     elif game_turn == 3:
         current_roll = game.roll_dice()
@@ -201,7 +192,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
             action_id = int
 
             execute_action(action_list, action_id, p4, game)
-            check_bonuses(p1, game)
 
             p4.turn = True
             while p4.turn == True:
@@ -211,7 +201,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p4, game)
-                check_bonuses(p1, game)
         else:
             valid_hexes = current_roll
 
@@ -224,7 +213,6 @@ while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vi
                 action_id = int
 
                 execute_action(action_list, action_id, p4, game)
-                check_bonuses(p1, game)
 
     else:
         print("Error: Invalid game turn number. (start turns)")

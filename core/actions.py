@@ -11,7 +11,7 @@ import game
 # ------------------------------
 def execute_action(action_list: list, action_id: int, player: Player, game: game.Game):
     """
-    Executes chosen action from action_list[action_index] by updating action_data then calling the correct execute action method through ACTIONS[action_type] dict"
+    Executes chosen action from action_list[action_index] by updating action_data then calling the correct execute action method through ACTIONS[action_type] dict.
     """
     # action_list: [Action(ActionType, dict)] -> action_list = search_all(player, game)
     action_type = action_list[action_id].type
@@ -24,11 +24,11 @@ def execute_action(action_list: list, action_id: int, player: Player, game: game
     check_largest_army(player, game)
     check_longest_road(player, game)
 
-def search_action(player, game):
+def search_action(player: Player, game: game.Game):
     """
-    Searches for all available actions and returns a list: [Action(ActionType.ACTION, {ActionData.DATA1: data1, ...}]
+    Searches for all available actions and returns a list: [Action(ActionType.ACTION, {ActionData.DATA1: data1, ...}].
     """
-    if game.net_turn <= 2:
+    if game.net_turn < 2:
         actions = []
     
         # Get a list of owned edges
@@ -81,9 +81,9 @@ def search_action(player, game):
 # Individual execute action functions
 # ------------------------------
 # Start turns
-def start_turns(player, game):
+def start_turns(player: Player, game: game.Game):
     """
-    Execute actions on TURNS 1 & 2
+    Execute actions on TURNS 1 & 2.
     """
     # Turn 1
     if player.pieces.get("settlements") == 5:
@@ -110,9 +110,9 @@ def start_turns(player, game):
             player.resource_cards[game.board[tile][0]] += 1
 
 # Build
-def build_road(player, game):
+def build_road(player: Player, game: game.Game):
     """
-    Build road on ActionData.BUILD_EDGE_ID
+    Build road on ActionData.BUILD_EDGE_ID.
     """
     player.resource_cards['wood'] -= 1
     player.resource_cards['brick'] -= 1
@@ -122,9 +122,9 @@ def build_road(player, game):
     player.pieces['roads'] -= 1
     game.edges[player.action_data.get(ActionData.BUILD_EDGE_ID)][1] = player.id
 
-def build_settlement(player, game):
+def build_settlement(player: Player, game: game.Game):
     """
-    Build settlement on ActionData.BUILD_NODE_ID
+    Build settlement on ActionData.BUILD_NODE_ID.
     """
     player.resource_cards['wood'] -= 1
     player.resource_cards['brick'] -= 1
@@ -140,9 +140,9 @@ def build_settlement(player, game):
     game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][1] = player.id
     game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
 
-def build_city(player, game):
+def build_city(player: Player, game: game.Game):
     """
-    Build city on ActionData.BUILD_NODE_ID
+    Build city on ActionData.BUILD_NODE_ID.
     """
     player.resource_cards['wheat'] -= 2
     player.resource_cards['stone'] -= 3
@@ -155,9 +155,9 @@ def build_city(player, game):
     game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][2] = 'city'
 
 # Buy development card
-def buy_devcard(player, game):
+def buy_devcard(player: Player, game: game.Game):
     """
-    Buy a development card
+    Buy a development card.
     """
     player.resource_cards['wheat'] -= 1
     player.resource_cards['sheep'] -= 1
@@ -172,26 +172,26 @@ def buy_devcard(player, game):
         player.vic_points += 1
 
 # Use development cards
-def use_devcard_knight(player, game):
+def use_devcard_knight(player: Player, game: game.Game):
     """
-    Use Knight development card
+    Use Knight development card.
     """
     player.development_cards['knight'] -= 1
     player.development_cards['used_knight'] += 1
     move_robber(player, game)
 
-def use_devcard_buildroad(player, game):
+def use_devcard_buildroad(player: Player, game: game.Game):
     """
-    Use Road Building development card
+    Use Road Building development card.
     """
     player.development_cards['build_road'] -= 1
     player.pieces['roads'] -= 2
     game.edges[player.action_data.get(ActionData.BUILD_EDGE_ID)][1] = player.id
     game.edges[player.action_data.get(ActionData.BUILD_EDGE_EXTRA_ID)][1] = player.id
 
-def use_devcard_yearofplenty(player, game):
+def use_devcard_yearofplenty(player: Player, game: game.Game):
     """
-    Use Year of Plenty development card
+    Use Year of Plenty development card.
     """
     player.development_cards['year_of_plenty'] -= 1
 
@@ -200,9 +200,9 @@ def use_devcard_yearofplenty(player, game):
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] += 1
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET_EXTRA)] += 1
 
-def use_devcard_monopoly(player, game):
+def use_devcard_monopoly(player: Player, game: game.Game):
     """
-    Use Monopoly development card
+    Use Monopoly development card.
     """
     player.development_cards['monopoly'] -= 1
     for other_player in game.players:
@@ -211,18 +211,18 @@ def use_devcard_monopoly(player, game):
             other_player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] = 0
 
 # Trade
-def trade_bank(player, game):
+def trade_bank(player: Player, game: game.Game):
     """
-    Trade 4 of ActionData.RESOURCE_GIVE with bank to get 1 of ActionData.RESOURCE_GET
+    Trade 4 of ActionData.RESOURCE_GIVE with bank to get 1 of ActionData.RESOURCE_GET.
     """
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] -= 4
     game.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] += 4
     player.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] += 1
     game.resource_cards[player.action_data.get(ActionData.RESOURCE_GET)] -= 1
 
-def trade_port(player, game):
+def trade_port(player: Player, game: game.Game):
     """
-    Trade 2 or 3 of ActionData.RESOURCE_GIVE with port to get 1 of ActionData.RESOURCE_GET 
+    Trade 2 or 3 of ActionData.RESOURCE_GIVE with port to get 1 of ActionData.RESOURCE_GET.
     """
     if player.action_data.get(ActionData.PORT) == '3:1':
         player.resource_cards[player.action_data.get(ActionData.RESOURCE_GIVE)] -= 3
@@ -237,9 +237,9 @@ def trade_port(player, game):
 
 # Move robber
 
-def move_robber(player, game):
+def move_robber(player: Player, game: game.Game):
     """
-    Move robber to ActionData.ROBBER_TILE_ID and steal random resource card from ActionData.ROBBER_PLAYER_TARGET
+    Move robber to ActionData.ROBBER_TILE_ID and steal random resource card from ActionData.ROBBER_PLAYER_TARGET.
     """
     game.board[game.robber_id[0]][3] = False
     game.robber_id[0] = player.action_data.get(ActionData.ROBBER_TILE_ID)
@@ -262,11 +262,12 @@ def move_robber(player, game):
             target_player.resource_cards[item] += 1
 
 # End turn
-def end_turn(player, game):
+def end_turn(player: Player, game: game.Game):
     """
-    End turn
+    End turn.
     """
-    player.turn = False
+    game.finish_turn()
+
 
 # Trade player ---
 
@@ -322,14 +323,14 @@ ACTIONS = {
 @dataclass
 class Action:
     """
-    Class to store action type and related action data
+    Class to store action type and related action data.
     """
     type: ActionType
     data: dict
 
-def search_build_road(player, game):
+def search_build_road(player: Player, game: game.Game):
     """
-    Searches for build road actions and returns a list: [(Action(ActionType.BUILD_ROAD, {ActionData.BUILD_EDGE_ID: edge_id}), ...]
+    Searches for build road actions and returns a list: [(Action(ActionType.BUILD_ROAD, {ActionData.BUILD_EDGE_ID: edge_id}), ...].
     """
     actions = []
 
@@ -354,9 +355,9 @@ def search_build_road(player, game):
 
         return actions
 
-def search_build_settlement(player, game):
+def search_build_settlement(player: Player, game: game.Game):
     """
-    Searches for build settlement actions and returns a list: [(Action(ActionType.BUILD_SETTLEMENT, {ActionData.BUILD_NODE_ID: node_id}), ...]
+    Searches for build settlement actions and returns a list: [(Action(ActionType.BUILD_SETTLEMENT, {ActionData.BUILD_NODE_ID: node_id}), ...].
     """
     actions = []
 
@@ -395,9 +396,9 @@ def search_build_settlement(player, game):
         
         return actions
 
-def search_build_city(player,game):
+def search_build_city(player: Player, game: game.Game):
     """
-    Searches for build city actions and returns a list: [(Action(ActionType.BUILD_SETTLEMENT, {ActionData.BUILD_NODE_ID: node_id}), ...]
+    Searches for build city actions and returns a list: [(Action(ActionType.BUILD_SETTLEMENT, {ActionData.BUILD_NODE_ID: node_id}), ...].
     """
     actions = []
 
@@ -411,9 +412,9 @@ def search_build_city(player,game):
 
         return actions
 
-def search_buy_devcard(player, game):
+def search_buy_devcard(player: Player, game: game.Game):
     """
-    Searches for buying development card action and returns a list: [(Action(ActionType.BUILD_DEV_CARD, {}), ...]
+    Searches for buying development card action and returns a list: [(Action(ActionType.BUILD_DEV_CARD, {}), ...].
     """
     actions = []
 
@@ -424,9 +425,9 @@ def search_buy_devcard(player, game):
         actions.append(new_action)
     return actions
 
-def search_devcard_knight(player, game): 
+def search_devcard_knight(player: Player, game: game.Game): 
     """
-    Searches for use Knight actions and returns a list: [(Action(ActionType.USE_KNIGHT, {ActionData.ROBBER_TILE_ID: tile, ActionData.ROBBER_PLAYER_TARGET: player_id}), ...]
+    Searches for use Knight actions and returns a list: [(Action(ActionType.USE_KNIGHT, {ActionData.ROBBER_TILE_ID: tile, ActionData.ROBBER_PLAYER_TARGET: player_id}), ...].
     """
     actions = []
 
@@ -455,9 +456,9 @@ def search_devcard_knight(player, game):
 
         return actions
 
-def search_devcard_buildroad(player, game):
+def search_devcard_buildroad(player: Player, game: game.Game):
     """
-    Searches for use Road Building actions and returns a list: [(ActionType.USE_BUILDROAD, {ActionData.BUILD_EDGE_ID: edge_id, ActionData.BUILD_EDGE_EXTRA_ID: edge_id), ...]
+    Searches for use Road Building actions and returns a list: [(ActionType.USE_BUILDROAD, {ActionData.BUILD_EDGE_ID: edge_id, ActionData.BUILD_EDGE_EXTRA_ID: edge_id), ...].
     """
     # Helper function that returns a set of valid edge ids for placing a road
     def buildroad_helper(player, game):
@@ -514,9 +515,9 @@ def search_devcard_buildroad(player, game):
 
         return actions
 
-def search_devcard_yearofplenty(player, game):
+def search_devcard_yearofplenty(player: Player, game: game.Game):
     """
-    Searches for use Year of Plenty actions and returns a list: [(ActionType.USE_YEAROFPLENTY, {ActionData.RESOURCE_GET: resource, ActionData.RESOURCE_GET_EXTRA: resource}), ...]
+    Searches for use Year of Plenty actions and returns a list: [(ActionType.USE_YEAROFPLENTY, {ActionData.RESOURCE_GET: resource, ActionData.RESOURCE_GET_EXTRA: resource}), ...].
     """
     actions = []
     if player.development_cards.get('year_of_plenty') < 1:
@@ -529,9 +530,9 @@ def search_devcard_yearofplenty(player, game):
                     actions.append(new_action)
         return actions
 
-def search_devcard_monopoly(player, game):
+def search_devcard_monopoly(player: Player, game: game.Game):
     """
-    Searches for use Monopoly actions and returns a list: [(ActionType.USE_MONOPOLY, {ActionData.RESOURCE_GET: resource}), ...]
+    Searches for use Monopoly actions and returns a list: [(ActionType.USE_MONOPOLY, {ActionData.RESOURCE_GET: resource}), ...].
     """
     actions = []
     if player.development_cards.get('monopoly') < 1:
@@ -542,9 +543,9 @@ def search_devcard_monopoly(player, game):
             actions.append(new_action)
         return actions
     
-def search_trade_bank(player, game):
+def search_trade_bank(player: Player, game: game.Game):
     """
-    Searches for use trade bank actions and returns a list: [(ActionType.TRADE_BANK, {ActionData.RESOURCE_GIVE: resource, ActionData.RESOURCE_GET: resource}), ...]
+    Searches for use trade bank actions and returns a list: [(ActionType.TRADE_BANK, {ActionData.RESOURCE_GIVE: resource, ActionData.RESOURCE_GET: resource}), ...].
     """
     actions = []
     for item in player.resource_cards.items():
@@ -555,9 +556,9 @@ def search_trade_bank(player, game):
                     actions.append(new_action)
     return actions
 
-def search_trade_port(player, game):
+def search_trade_port(player: Player, game: game.Game):
     """
-    Searches for use trade port actions and returns a list: [(ActionType.TRADE_PORT, {ActionData.RESOURCE_GIVE: resource, ActionData.RESOURCE_GET: resource}), ...]
+    Searches for use trade port actions and returns a list: [(ActionType.TRADE_PORT, {ActionData.RESOURCE_GIVE: resource, ActionData.RESOURCE_GET: resource}), ...].
     """
     actions = []
     port_nodes = [1, 2, 4, 5, 8, 9, 11, 12, 14, 18, 19, 21, 22, 24, 25, 28, 29]
@@ -588,9 +589,9 @@ def search_trade_port(player, game):
 
     return actions
 
-def search_move_robber(player, game):
+def search_move_robber(player: Player, game: game.Game):
     """
-    Searches for move robber actions and returns a list: [(Action(ActionType.MOVE_ROBBER, {ActionData.ROBBER_TILE_ID: tile, ActionData.ROBBER_PLAYER_TARGET: player_id}), ...]
+    Searches for move robber actions and returns a list: [(Action(ActionType.MOVE_ROBBER, {ActionData.ROBBER_TILE_ID: tile, ActionData.ROBBER_PLAYER_TARGET: player_id}), ...].
     """
     actions = []
     tiles = set(range(1, 20))
@@ -614,17 +615,19 @@ def search_move_robber(player, game):
 
     return actions
 
-def search_end_turn(player, game):
+def search_end_turn(player: Player, game: game.Game):
     """
-    Returns a list: [(Action(ActionType.END_TURN, {})]
+    Returns a list: [(Action(ActionType.END_TURN, {})].
     """
     return [Action(ActionType.END_TURN, {})]
 
 # ------------------------------
 # Additional check functions
 # ------------------------------
-def check_largest_army(player, game):
-    "Checks and updates largest army bonus"
+def check_largest_army(player: Player, game: game.Game):
+    """
+    Checks and updates largest army bonus.
+    """
     if player.id == game.largest_army_player_id:
         return
     elif player.development_cards.get("used_knight") < 3:
@@ -650,8 +653,10 @@ def check_largest_army(player, game):
             else:
                 return
 
-def check_longest_road(player, game):
-    "Checks and updates longest road bonus"
+def check_longest_road(player: Player, game: game.Game):
+    """
+    Checks and updates longest road bonus.
+    """
     if player.id == game.longest_road_player_id:
         return
 

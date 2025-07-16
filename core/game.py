@@ -1,7 +1,5 @@
 import random 
 
-
-
 class Game:
     """
     A class containining the components of a Settlers of Catan game: 
@@ -74,11 +72,14 @@ class Game:
         self.development_cards = self.generate_development_cards()
         self.resource_cards = self.generate_resource_cards()
 
-        # Generate board tiles + store robber tile id + turn number
+        # Generate board tiles + store robber tile id
         self.robber_id = [0]
         self.board = self.generate_board(self.robber_id)
-        self.net_turn = 0
-        self.current_turn = 0
+
+        # Turn info
+        self.current_player_idx = 0
+        self.turn_number = 0
+        self.turn_started = False
 
         # Static definitions for vertices and edges
         self.nodes = self.create_nodes()
@@ -192,7 +193,23 @@ class Game:
         total_roll = die1 + die2
 
         if total_roll == 7:
-            return total_roll, ["robber"]
+            # Take half of all player resources
+            for p in self.players:
+                resource_list = []
+                for resource_name, resource_amount in p.resource_cards.items():
+                    for i in range(resource_amount):
+                        resource_list.append(resource_name)
+                    resource_amount = 0
+                
+                if len(resource_list) > 7:
+                    random.shuffle(resource_list)
+                    for i in range(len(resource_list) / 2):
+                        resource_list.pop()
+                    for resource in resource_list:
+                        p.resource_cards[resource] += 1
+
+            return "robber"
+
         else:
             valid_hexs = []
             for tile_id in self.board:
@@ -200,7 +217,6 @@ class Game:
                 if token == total_roll and not has_robber:
                     valid_hexs.append(tile_id)
         
-
         # Award resources to players
         for tile_id in valid_hexs:
             for node_id, node_data in self.nodes.items():
@@ -213,6 +229,24 @@ class Game:
                             else:
                                 award_resource(self, p, self.board[tile_id], amount=2)
         return total_roll
+
+    def begin_turn(self):
+        """
+        Rolls dice and returns roll if this is the first roll on the current turn. Otherwise returns 0.
+        """
+        if not self.turn_started:
+            self.turn_started = True
+            return self.roll_dice()
+        else:
+            return 0
+
+    def finish_turn(self):
+        self.turn_started = False
+        self.next_turn()
+    
+    def next_turn(self):
+        self.current_player_idx = (self.current_player_idx + 1) % len(self.players)
+
 
     # ----------------------------------------
     # Node (vertex) definitions

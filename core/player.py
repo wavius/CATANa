@@ -33,7 +33,6 @@ class Player:
 
     def __init__(self, player_id):
         self.id = player_id
-        self.turn = True
         self.resource_cards = {
             # Resource cards
             'brick': 0,
@@ -73,7 +72,6 @@ class Player:
             # Trade data
             ActionData.TARGET_PLAYER: str,
             ActionData.PORT: str,
-            ActionData.SPECIAL_RESOURCE_GIVE: str,
 
             # Other data
             ActionData.ROBBER_TILE_ID: int,
