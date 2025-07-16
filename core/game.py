@@ -80,6 +80,7 @@ class Game:
         self.current_player_idx = 0
         self.turn_number = 0
         self.turn_started = False
+        self.last_roll = 0
 
         # Static definitions for vertices and edges
         self.nodes = self.create_nodes()
@@ -234,11 +235,8 @@ class Game:
         """
         Rolls dice and returns roll if this is the first roll on the current turn. Otherwise returns 0.
         """
-        if not self.turn_started:
-            self.turn_started = True
-            return self.roll_dice()
-        else:
-            return 0
+        self.turn_started = True
+        return self.roll_dice()
 
     def finish_turn(self):
         self.turn_started = False
