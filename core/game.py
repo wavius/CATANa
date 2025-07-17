@@ -13,7 +13,7 @@ class Game:
     # ----------------------------------------
     # Class-level constants
     # ----------------------------------------
-    PLAYERS = ["p1", "p2", "p3", "p4", "none"]
+    PLAYER_NAMES = ["p1", "p2", "p3", "p4"]
 
     #Randomly shuffled to list of development cards stored in list called "development_cards"
     #String value is the type of card, int value is the number of cards of that type in the deck
@@ -78,7 +78,7 @@ class Game:
 
         # Turn info
         self.current_player_idx = 0
-        self.turn_number = 0
+        self.turn_number = 1
         self.turn_started = False
         self.last_roll = 0
 
@@ -87,7 +87,7 @@ class Game:
         self.edges = self.create_edges()
 
         # Generate player names
-        self.players = self.generate_player_names()
+        self.players = []
 
         # Store largest army and longest road
         self.longest_road_player_id = "none"
@@ -240,10 +240,27 @@ class Game:
 
     def finish_turn(self):
         self.turn_started = False
+        self.turn_number += 1
         self.next_turn()
     
     def next_turn(self):
-        self.current_player_idx = (self.current_player_idx + 1) % len(self.players)
+        num_players = len(self.players)
+
+        # Setup phase: first 2 * num_players turns
+        if self.turn_number <= (2 * num_players) - 1:
+            t = self.turn_number  # turn count so far
+            if t < num_players:
+                self.current_player_idx = t  # 0, 1, 2, 3
+            else:
+                self.current_player_idx = (2 * num_players - 1) - t  # 3, 2, 1, 0
+            self.turn_number += 1
+        elif self.turn_number == 8: # Player 1 gets two turns in a row, the final setup turn and the first actual game turn
+            self.current_player_idx = 0
+            self.turn_number += 1
+        else:
+            # Normal clockwise turn order
+            self.current_player_idx = (self.current_player_idx + 1) % num_players
+            self.turn_number += 1
 
 
     # ----------------------------------------
@@ -392,8 +409,6 @@ class Game:
     # ----------------------------------------
     # Generate Player Names
     # ----------------------------------------
-    def generate_player_names(self):
-        return self.PLAYERS.copy()
 # ----------------------------------------
 # Example usage
 # ----------------------------------------
