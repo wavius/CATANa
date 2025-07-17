@@ -28,7 +28,7 @@ def search_action(player: Player, game: game.Game):
     """
     Searches for all available actions and returns a list: [Action(ActionType.ACTION, {ActionData.DATA1: data1, ...}].
     """
-    if game.net_turn < 2:
+    if game.turn_number <= 2:
         actions = []
     
         # Get a list of owned edges
