@@ -56,6 +56,9 @@ class Player:
             'cities': 4,
             'roads': 15
         }
+        
+        self.owned_nodes = set()
+        self.owned_edges = set()
 
         # Data for all possible actions
         self.action_data = {
