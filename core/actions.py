@@ -89,21 +89,25 @@ def start_turns(player: Player, game: game.Game):
     if player.pieces.get("settlements") == 5:
         player.pieces['roads'] -= 1
         game.edges[player.action_data.get(ActionData.BUILD_EDGE_ID)][1] = player.id
+        player.owned_edges.add(ActionData.BUILD_EDGE_ID)
 
         player.vic_points += 1
         player.pieces['settlements'] -= 1
         game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][1] = player.id
         game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
+        player.owned_nodes.add(ActionData.BUILD_NODE_ID)
 
     # Turn 2
     else:
         player.pieces['roads'] -= 1
         game.edges[player.action_data.get(ActionData.BUILD_EDGE_ID)][1] = player.id
+        player.owned_edges.add(ActionData.BUILD_EDGE_ID)
 
         player.vic_points += 1
         player.pieces['settlements'] -= 1
         game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][1] = player.id
         game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
+        player.owned_edges.add(ActionData.BUILD_NODE_ID)
 
         # Get resources from tiles adjacent to BUILD_NODE
         for tile in game.nodes[ActionData.BUILD_NODE_ID][0]:
@@ -121,6 +125,7 @@ def build_road(player: Player, game: game.Game):
 
     player.pieces['roads'] -= 1
     game.edges[player.action_data.get(ActionData.BUILD_EDGE_ID)][1] = player.id
+    player.owned_edges.add(ActionData.BUILD_EDGE_ID)
 
 def build_settlement(player: Player, game: game.Game):
     """
@@ -139,6 +144,7 @@ def build_settlement(player: Player, game: game.Game):
     player.pieces['settlements'] -= 1
     game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][1] = player.id
     game.nodes[player.action_data.get(ActionData.BUILD_NODE_ID)][1][2] = 'settlement'
+    player.owned_nodes.add(ActionData.BUILD_NODE_ID)
 
 def build_city(player: Player, game: game.Game):
     """
@@ -188,6 +194,8 @@ def use_devcard_buildroad(player: Player, game: game.Game):
     player.pieces['roads'] -= 2
     game.edges[player.action_data.get(ActionData.BUILD_EDGE_ID)][1] = player.id
     game.edges[player.action_data.get(ActionData.BUILD_EDGE_EXTRA_ID)][1] = player.id
+    player.owned_edges.add(ActionData.BUILD_EDGE_ID)
+    player.owned_edges.add(ActionData.BUILD_EDGE_EXTRA_ID)
 
 def use_devcard_yearofplenty(player: Player, game: game.Game):
     """
