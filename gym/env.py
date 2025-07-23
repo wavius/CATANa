@@ -4,7 +4,7 @@ import random
 import numpy as np
 from core import game, player, actions
 
-class CatanAgent(gym.Env): 
+class CatanEnv(gym.Env): 
 
     def __init__(self):
         # Max number of possible actions
@@ -22,8 +22,6 @@ class CatanAgent(gym.Env):
             self.catan_game.players.append(player.Player(name))
 
         self.current_player = None
-
-        pass
     
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
         """Start a new episode.
@@ -108,6 +106,37 @@ class CatanAgent(gym.Env):
         info = self._get_info()
         return obs, reward, done, False, info
 
+    def _get_obs(self):
+        """Convert internal state to observation format.
+        Returns:
+            dict: 
+        """
+        game = self.catan_game
+        player = game.players[game.current_player_idx]
+
+        return {
+            # Player state
+            "player_state": self.encode_player_state(player),
+
+            # Board state
+            "nodes": self.encode_node_data(game.nodes),
+            "edges": self.encode_edge_data(game.edges),
+            "tiles": self.encode_board_data(game.board),
+
+            # Game state
+            "turn_index": game.turn_number,
+            "actions": actions.search_action(player, game)
+        }
+
+    def _get_info(self):
+        """Compute auxiliary information for debugging.
+        Returns:
+            dict: 
+        """
+        pass
+
+
+    # Helpers
     def setup_turns_logic(self, action=None):
         """Execute one timestep for the first two setup turns in Catan.
         Args:
@@ -147,18 +176,117 @@ class CatanAgent(gym.Env):
 
         obs = self.catan_game.get_observation()
         return obs, reward, done, truncated, info
-
-    def _get_obs(self):
-        """Convert internal state to observation format.
+    
+    def encode_player_state(self, player: player.Player):
+        """Numerically encodes player state to an array.
+        Args:
+            player: player
         Returns:
-            dict: Observation with agent and target positions
+            Array: [pieces, resource_cards, development_cards, vic_points]
         """
-        pass
+        
+        player_state = []
+        for name, data in player.pieces:
+            player_state.append(data)
+        for name, data in player.resource_cards:
+            player_state.append(data)
+        for name, data in player.development_cards:
+            player_state.append(data)
+        player_state.append(player.vic_points)
 
-    def _get_info(self):
-        """Compute auxiliary information for debugging.
+        return np.array(player_state)
+
+    def encode_node_data(nodes_dict: dict):
+        """Numerically encodes node dictionary to an array.
+        Args:
+            nodes_dict: Nodes dictionary
         Returns:
-            dict: Info with distance between agent and target
+            2DArray: [tile_1, tile_2, tile_3, port, owner, building]
         """
-        pass
 
+        PORT_MAP = {
+            "none": 0, "3:1": 1, "wheat": 2, "wood": 3,
+            "sheep": 4, "brick": 5, "rock": 6
+        }
+        BUILDING_MAP = {
+            "none": 0, "settlement": 1, "city": 2
+        }
+        OWNER_MAP = {
+            "none": 0, "p1": 1, "p2": 2, "p3": 3, "p4": 4
+        }
+
+        node_data = []
+
+        for i in range(1, 55):  # Node ids 1 to 54
+            tiles, [port, owner, building] = nodes_dict[i]
+
+            tiles_encoded = tiles + [-1] * (3 - len(tiles))  # pad to 3 tiles
+            port_encoded = PORT_MAP[port]
+            owner_encoded = OWNER_MAP[owner]
+            building_encoded = BUILDING_MAP[building]
+
+            node_vector = tiles_encoded + [port_encoded, owner_encoded, building_encoded]
+            node_data.append(node_vector)
+
+        return np.array(node_data)
+    
+    def encode_edge_data(edges_dict: dict):
+        """Numerically encodes edge dictionary to an array.
+        Args:
+            edges_dict: Edges dictionary
+        Returns:
+            2DArray: [int, resource, token, dots, has_robber]
+        """
+
+        OWNER_MAP = {
+            "none": 0, "p1": 1, "p2": 2, "p3": 3, "p4": 4
+        }
+        
+        edge_data = []
+
+        for i in range(1, 73):  # Edge ids 1 to 72
+            nodes, owner = edges_dict[i]
+
+            nodes_encoded = nodes
+            owner_encoded = OWNER_MAP[owner]
+            
+
+            edge_vector = nodes_encoded + [owner_encoded]
+            edge_data.append(edge_vector)
+
+        return np.array(edge_data)
+    
+    def encode_board_data(board_dict: dict):
+        """Numerically encodes board dictionary to an array.
+        Args:
+            board_dict: board dictionary
+        Returns:
+            2DArray: [int, resource, token, dots, has_robber]
+        """
+        
+        RESOURCE_MAP = {
+            "wheat": 1, "wood": 2,
+            "sheep": 3, "brick": 4, "rock": 5
+        }
+        ROBBER_MAP = {
+            "true": 1, "false": 0
+        }
+
+        tile_data = []
+
+        for i in range(1, 73):  # Edge ids 1 to 72
+            int, [resource, token, dots, has_robber] = board_dict[i]
+
+            int_encoded = int
+            resource_encoded = RESOURCE_MAP[resource]
+            token_encoded = token
+            dots_encoded = dots
+            robber_encoded = ROBBER_MAP[has_robber]
+
+            tile_vector = [int_encoded, resource_encoded, token_encoded, dots_encoded, robber_encoded]
+            tile_data.append(tile_vector)
+
+        return np.array(tile_data)
+    
+    def encode_action_data(action_dict: dict):
+        pass
