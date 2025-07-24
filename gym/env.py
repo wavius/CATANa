@@ -125,7 +125,7 @@ class CatanEnv(gym.Env):
 
             # Game state
             "turn_index": game.turn_number,
-            "actions": actions.search_action(player, game)
+            "actions": self.encode_action_data(actions.search_action(player, game))
         }
 
     def _get_info(self):
@@ -288,5 +288,60 @@ class CatanEnv(gym.Env):
 
         return np.array(tile_data)
     
-    def encode_action_data(action_dict: dict):
-        pass
+    def encode_action_data(action_list: list):
+        ACTION_TYPE_MAP = {
+            'ActionType.START_TURNS': 1,
+
+            'ActionType.BUILD_ROAD': 2,
+            'ActionType.BUILD_SETTLEMENT': 3,
+            'ActionType.BUILD_CITY': 4,
+            'ActionType.BUY_DEV_CARD': 5,
+
+            'ActionType.USE_KNIGHT': 6,
+            'ActionType.USE_BUILDROAD': 7,
+            'ActionType.USE_MONOPOLY': 8,
+            'ActionType.USE_YEAROFPLENTY': 9,
+
+            'ActionType.TRADE_BANK': 10,
+            'ActionType.TRADE_PORT': 11,
+            # 'ActionType.TRADE_PLAYER': trade_player,
+
+            'ActionType.MOVE_ROBBER': 12,
+            'ActionType.END_TURN': 13
+        }
+        
+        ACTION_DATA_MAP = {
+            'BUILD_NODE_ID': 1,
+            'BUILD_EDGE_ID': 2,
+            'BUILD_EDGE_EXTRA_ID': 3,
+
+            'RESOURCE_GIVE': 4,
+            'RESOURCE_GET': 5,
+            'RESOURCE_GET_EXTRA': 6,
+
+            'TARGET_PLAYER': 7,
+            'PORT': 8,
+
+            'ROBBER_TILE_ID': 9,
+            'ROBBER_PLAYER_TARGET': 10
+        }
+        actions_list_encoded = []
+        
+        for action in action_list:
+            
+            action_type = ACTION_TYPE_MAP[action.type]
+            action_data = []
+
+            for key, value in action.data:
+                action_data.append(ACTION_DATA_MAP[key])
+                action_data.append(value)
+
+            action_vector = [action_type] + action_data
+
+            if len(action_vector) < 5:
+                action_vector += [0, 0]
+
+            actions_list_encoded.append(action_vector)
+        
+        return np.array(actions_list_encoded)
+    
