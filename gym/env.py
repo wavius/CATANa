@@ -9,7 +9,7 @@ class CatanEnv(gym.Env):
     def __init__(self):
         # Max number of possible actions
         # CHANGE
-        num_actions = int
+        num_actions = 1000
 
         # Define observation space
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(gym.obs_dim,), dtype=np.float32)
@@ -115,7 +115,7 @@ class CatanEnv(gym.Env):
         player = game.players[game.current_player_idx]
 
         return {
-            # Player state
+            # Player state: [pieces, resource cards, development cards, victory points, largest army, longest road]
             "player_state": self.encode_player_state(player),
 
             # Board state
@@ -177,22 +177,28 @@ class CatanEnv(gym.Env):
         obs = self.catan_game.get_observation()
         return obs, reward, done, truncated, info
     
-    def encode_player_state(self, player: player.Player):
+    def encode_player_state(self, p: player.Player):
         """Numerically encodes player state to an array.
         Args:
-            player: player
+            p: Player
         Returns:
-            Array: [pieces, resource_cards, development_cards, vic_points]
+            Array: [total cities/settlements, total resource cards, total development cards, victory points]
         """
+
+        total_pieces = 0
+        for name, data in p.pieces:
+            if name != "roads":
+                total_pieces += data
+
+        total_resources = 0
+        for name, data in p.resource_cards:
+            total_resources += data
         
-        player_state = []
-        for name, data in player.pieces:
-            player_state.append(data)
-        for name, data in player.resource_cards:
-            player_state.append(data)
-        for name, data in player.development_cards:
-            player_state.append(data)
-        player_state.append(player.vic_points)
+        total_development_cards = 0
+        for name, data in p.development_cards:
+            total_development_cards += data
+
+        player_state = [total_pieces, total_resources, total_development_cards, p.vic_points]
 
         return np.array(player_state)
 
@@ -268,9 +274,6 @@ class CatanEnv(gym.Env):
             "wheat": 1, "wood": 2,
             "sheep": 3, "brick": 4, "rock": 5
         }
-        ROBBER_MAP = {
-            "true": 1, "false": 0
-        }
 
         tile_data = []
 
@@ -281,7 +284,7 @@ class CatanEnv(gym.Env):
             resource_encoded = RESOURCE_MAP[resource]
             token_encoded = token
             dots_encoded = dots
-            robber_encoded = ROBBER_MAP[has_robber]
+            robber_encoded = int(has_robber)
 
             tile_vector = [int_encoded, resource_encoded, token_encoded, dots_encoded, robber_encoded]
             tile_data.append(tile_vector)
