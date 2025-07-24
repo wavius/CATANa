@@ -38,53 +38,69 @@ class CatanAgent:
 
         self.training_error = []
 
-        def get_action(self, obs: dict) -> int:
-            """Choose an action using epsilon-greedy strategy.
+    def get_action(self, obs: dict) -> int:
+        """Choose an action using epsilon-greedy strategy.
 
-            Returns:
-                action: 0 (stand) or 1 (hit)
-            """
+        Returns:
+            action: Index of chosen action vector 
+        """
+        legal_actions = obs["actions"]
+        state_key = self.encode_state(obs)
 
-            legal_actions = len(obs['actions'])
-            # With probability epsilon: explore (random action)
-            if np.random.random() < self.epsilon:
-                return random.choice(legal_actions)
+        # Explore
+        if np.random.random() < self.epsilon:
+            return random.choice(legal_actions)
 
-            # With probability (1-epsilon): exploit (best known action)
-            else:
-                return int(np.argmax(self.q_values[obs]))
+        # Exploit
+        q_values = []
+        for action in legal_actions:
+            action_key = tuple(action)
+            q_values.append(self.q_values[(state_key, action_key)])
+
+        best_idx = int(np.argmax(q_values))
+        action_idx = obs["actions"].index(legal_actions[best_idx])
+
+        return action_idx
             
-        
-        def update(
+    def update(
             self,
             obs: dict,
-            action: int,
+            action: np.ndarray,
             reward: float,
             terminated: bool,
             next_obs: dict,
         ):
-            """Update Q-value based on experience.
+            """Update Q-value based on experience with vector actions and dict obs."""
 
-            This is the heart of Q-learning: learn from (state, action, reward, next_state)
-            """
-            # What's the best we could do from the next state?
-            # (Zero if episode terminated - no future rewards possible)
-            future_q_value = (not terminated) * np.max(self.q_values[next_obs])
+            # Convert to hashable keys
+            state_key = self.encode_state(obs)
+            next_state_key = self.encode_state(next_obs)
+            action_key = tuple(action)
 
-            # What should the Q-value be? (Bellman equation)
+            # Get best Q-value for next state
+            future_q_value = 0.0
+            if not terminated:
+                next_actions = next_obs["actions"]
+                future_q_value = max(
+                    self.q_values[(next_state_key, tuple(a))] for a in next_actions
+                )
+
+            # Target Q-value using Bellman equation
             target = reward + self.discount_factor * future_q_value
 
-            # How wrong was our current estimate?
-            temporal_difference = target - self.q_values[obs][action]
+            # TD error and Q-value update
+            q_key = (state_key, action_key)
+            td_error = target - self.q_values[q_key]
+            self.q_values[q_key] += self.lr * td_error
 
-            # Update our estimate in the direction of the error
-            # Learning rate controls how big steps we take
-            self.q_values[obs][action] = (
-                self.q_values[obs][action] + self.lr * temporal_difference
-            )
+            # Track training error
+            self.training_error.append(td_error)
 
-            # Track learning progress (useful for debugging)
-            self.training_error.append(temporal_difference)
+    def encode_state(self, obs: dict) -> tuple:
+        """Turn dict obs into a hashable state key."""
+        return (
+            tuple(obs["player_state"])
+        )
 
     def decay_epsilon(self):
         """Reduce exploration rate after each episode."""
