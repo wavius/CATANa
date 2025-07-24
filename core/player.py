@@ -59,6 +59,8 @@ class Player:
         
         self.owned_nodes = set()
         self.owned_edges = set()
+        self.has_longest_road = False
+        self.has_largest_army = False
 
         # Data for all possible actions
         self.action_data = {
