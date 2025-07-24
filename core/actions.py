@@ -642,6 +642,7 @@ def check_largest_army(p: Player, g: game.Game):
         return
     elif g.largest_army_player_id == "none":
         g.largest_army_player_id = p.id
+        p.has_largest_army = True
         p.vic_points += 2
         return
     else:
@@ -651,11 +652,15 @@ def check_largest_army(p: Player, g: game.Game):
                 continue
             elif num > other_player.development_cards.get("used_knight"):
                 g.largest_army_player_id = p.id
-                other_player.vic_points -= 2
+                p.has_largest_army = True
                 p.vic_points += 2
+
+                other_player.has_largest_army = False
+                other_player.vic_points -= 2
                 return
             elif num == other_player.development_cards.get("used_knight"):
                 g.largest_army_player_id = "none"
+                other_player.has_largest_army = False
                 other_player.vic_points -= 2
                 return
             else:
@@ -720,7 +725,16 @@ def check_longest_road(p: Player, g: game.Game):
                 g.longest_road_player_id = p.id
                 g.longest_road_length = longest
                 
+                p.has_longest_road = True
                 p.vic_points += 2
+
+                other_player.has_longest_road = False
+                other_player.vic_points -= 2
+
+            elif longest == g.longest_road_length:
+                g.longest_road_player_id = "none"
+                other_player.has_longest_road = False
+                other_player.vic_points -= 2
             return
 
 # ------------------------------
