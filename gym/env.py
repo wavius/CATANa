@@ -8,8 +8,8 @@ class CatanEnv(gym.Env):
 
     def __init__(self):
         # Max number of possible actions
-        # 144 action max occurs on first turn
-        num_actions = 144
+        # CHANGE
+        num_actions = int
 
         # Define observation space
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(gym.obs_dim,), dtype=np.float32)
@@ -109,7 +109,7 @@ class CatanEnv(gym.Env):
     def _get_obs(self):
         """Convert internal state to observation format.
         Returns:
-            dict: 
+            dict
         """
         game = self.catan_game
         player = game.players[game.current_player_idx]
