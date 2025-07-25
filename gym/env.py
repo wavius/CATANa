@@ -37,7 +37,13 @@ class CatanEnv(gym.Env):
         self.agent_player = self.catan_game.players[random.randint(0, 3)]
 
         # Turn game state into numeric vector
-        pass
+        obs = self._get_obs()
+        info = self._get_info()
+        reward = 0.0
+        terminated = False
+        truncated = False
+        
+        return obs, reward, terminated, truncated, info
 
     def step(self, action=None):
         """Execute one timestep within the environment.
@@ -47,9 +53,8 @@ class CatanEnv(gym.Env):
             tuple: (observation, reward, terminated, truncated, info)
         """
         reward = 0.0
-        done = False
+        terminated = False
         truncated = False
-        info = {}
 
         # Setup phase
         if self.catan_game.turn_number <= 2 * len(self.catan_game.players):
@@ -67,7 +72,7 @@ class CatanEnv(gym.Env):
                 if is_agent_turn:
                     obs = self._get_obs()
                     info = self._get_info()
-                    return obs, reward, done, truncated, info
+                    return obs, reward, terminated, truncated, info
             else:
                 roll = self.catan_game.last_roll
 
@@ -82,7 +87,7 @@ class CatanEnv(gym.Env):
                     # Agent needs to be given an action next step()
                     obs = self._get_obs()
                     info = self._get_info()
-                    return obs, reward, done, False, info
+                    return obs, reward, terminated, False, info
                 else:
                     # Wait for agent to act
                     actions.execute_action(action_list, action, current_player, self.catan_game)
@@ -94,17 +99,17 @@ class CatanEnv(gym.Env):
             # Check victory
             if self.catan_game.check_victory(current_player):
                 reward = 1.0 if is_agent_turn else -1.0
-                done = True
+                terminated = True
                 obs = self._get_obs()
                 info = self._get_info()
-                return obs, reward, done, truncated, info
+                return obs, reward, terminated, truncated, info
 
             if is_agent_turn:
                 break
 
         obs = self._get_obs()
         info = self._get_info()
-        return obs, reward, done, False, info
+        return obs, reward, terminated, truncated, info
 
     def _get_obs(self):
         """Convert internal state to observation format.
