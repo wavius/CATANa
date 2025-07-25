@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import random
 import copy
 from core.player import Player, ActionData
-import game
+from core import game
 
 
 # ------------------------------
