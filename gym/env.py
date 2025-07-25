@@ -20,6 +20,9 @@ class CatanEnv(gym.Env):
         # Initialize players
         for name in self.catan_game.PLAYER_NAMES:
             self.catan_game.players.append(player.Player(name))
+        
+        # Initialize game
+        self.catan_game = game.Game()
 
         self.current_player = None
     
@@ -42,7 +45,7 @@ class CatanEnv(gym.Env):
         reward = 0.0
         terminated = False
         truncated = False
-        
+
         return obs, reward, terminated, truncated, info
 
     def step(self, action=None):
