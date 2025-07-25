@@ -3,223 +3,38 @@ from player import Player
 from actions import *
 
 # Initialize game
-game = game.Game()
-
+catan_game = game.Game()
 # Initialize players
-game.players[0] = Player(game.players[0])
-game.players[1] = Player(game.players[1])
-game.players[2] = Player(game.players[2])
-game.players[3] = Player(game.players[3])
-
-p1 = game.players[0]
-p2 = game.players[1]
-p3 = game.players[2]
-p4 = game.players[3]
-
-print( "Players initialized: ", game.players[0].id, game.players[1].id, game.players[2].id, game.players[3].id) #debug only
-
-# Intialize turn variables
-game_turn = 0
-net_turn = 0
-
-print("-----------------starting game-----------------") #debug only
-
-# Start loop 
-while net_turn < 2:
-    if game_turn == 0:
-        # Player 1's turn (start turns)
-        action_list = search_action_start_turns(p1, game)
-
-        # AI evaluation method goes here
-        action_id = int
-
-        execute_action(action_list, action_id, p1, game)
-
-    elif game_turn == 1:
-        # Player 2's turn (start turns)
-        action_list = search_action_start_turns(p2, game)
-
-        # AI evaluation method goes here
-        action_id = int
-
-        execute_action(action_list, action_id, p2, game)
-
-    elif game_turn == 2:
-        # Player 3's turn (start turns)
-        action_list = search_action_start_turns(p3, game)
-
-        # AI evaluation method goes here
-        action_id = int
-
-        execute_action(action_list, action_id, p3, game)
-
-    elif game_turn == 3:
-        # Player 4's turn (start turns)
-        action_list = search_action_start_turns(p4, game)
-
-        # AI evaluation method goes here
-        action_id = int
-
-        execute_action(action_list, action_id, p4, game)
-
-    else:
-        print("Error: Invalid game turn number.")
-    
-    
-    # turn ticker
-    print("End of start turn ", net_turn, " for player ", game_turn + 1)
-
-    # --- snake-order advance ---
-    if net_turn == 0:
-        game_turn += 1
-        if game_turn > 3:
-            net_turn = 1
-            game_turn = 3
-    else:
-        # descending phase: move 3→2→1→0
-        game_turn -= 1
-        if game_turn < 0:
-            net_turn = 2
-            game_turn = 0
-            print("End of start turns, starting game turns now.") #debug only
+for name in catan_game.PLAYER_NAMES:
+    catan_game.players.append(Player(name))
 
 
-# Game loop
-while p1.vic_points < 10 and p2.vic_points < 10 and p3.vic_points < 10 and p4.vic_points < 10 and net_turn < 75 and net_turn >= 2:
-    print("----------------------------------") #debug only
-    if game_turn == 0:
-        current_roll = game.roll_dice()
-        if current_roll == "robber":
-            # Robber turn code
-            action_list = search_move_robber(p1, game)
+p1 = catan_game.players[0]
+p2 = catan_game.players[1]
+p3 = catan_game.players[2]
+p4 = catan_game.players[3]
 
-            # AI evaluation method goes here
-            action_id = int
 
-            execute_action(action_list, action_id, p1, game)
+player = game.players[game.current_player_idx]
+        
 
-            p1.turn = True
-            while p1.turn == True:
-                action_list = search_action(p1, game)
 
-                # AI evaluation method goes here
-                action_id = int
+        
+dict = {
+    # Player state
+    "player_state": [],
+    # Pieces
+    # Resource cards
+    # Development cards
+    # Victory points
 
-                execute_action(action_list, action_id, p1, game)
-        else:
-            valid_hexes = current_roll
+    # Board state
+    "board_state": [],
+    # Robber
+    # Dots, resources
+    # Nodes, edges
 
-            # Player 1's turn
-            p1.turn = True
-            while p1.turn == True:
-                action_list = search_action(p1, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p1, game)
-
-    elif game_turn == 1:
-        current_roll = game.roll_dice()
-        if current_roll == "robber":
-            # Robber turn code
-            action_list = search_move_robber(p2, game)
-
-            # AI evaluation method goes here
-            action_id = int
-
-            execute_action(action_list, action_id, p2, game)
-
-            p2.turn = True
-            while p2.turn == True:
-                action_list = search_action(p2, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p2, game)
-        else:
-            valid_hexes = current_roll
-            # Player 2's turn 
-            p2.turn = True
-            while p2.turn == True:
-                action_list = search_action(p2, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p2, game)
-
-    elif game_turn == 2:
-        current_roll = game.roll_dice()
-        if current_roll == "robber":
-            # Robber turn code
-            action_list = search_move_robber(p3, game)
-
-            # AI evaluation method goes here
-            action_id = int
-
-            execute_action(action_list, action_id, p3, game)
-
-            p3.turn = True
-            while p3.turn == True:
-                action_list = search_action(p3, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p3, game)
-        else:
-            valid_hexes = current_roll
-
-            # Player 3's turn
-            p3.turn = True
-            while p3.turn == True:
-                action_list = search_action(p3, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p3, game)
-
-    elif game_turn == 3:
-        current_roll = game.roll_dice()
-        if current_roll == "robber":
-            # Robber turn code
-            action_list = search_move_robber(p4, game)
-
-            # AI evaluation method goes here
-            action_id = int
-
-            execute_action(action_list, action_id, p4, game)
-
-            p4.turn = True
-            while p4.turn == True:
-                action_list = search_action(p4, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p4, game)
-        else:
-            valid_hexes = current_roll
-
-            # Player 4's turn 
-            p4.turn = True
-            while p4.turn == True:
-                action_list = search_action(p4, game)
-
-                # AI evaluation method goes here
-                action_id = int
-
-                execute_action(action_list, action_id, p4, game)
-
-    else:
-        print("Error: Invalid game turn number. (start turns)")
-    print(current_roll) #debug only   
-    #turn ticker
-    print("End of turn ", net_turn, " for player ", game_turn + 1)
-    game_turn += 1
-    if game_turn > 3:
-        net_turn += 1
-        game_turn = 0
+    # Game state
+    "turn_index": game.turn_number,
+    "actions": search_action(player, game)
+}
