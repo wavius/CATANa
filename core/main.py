@@ -1,6 +1,6 @@
 import game
-from player import Player
-from actions import *
+from core.player import Player
+from core.actions import *
 
 # Initialize game
 catan_game = game.Game()

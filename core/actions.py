@@ -2,7 +2,7 @@ from enum import Enum
 from dataclasses import dataclass
 import random
 import copy
-from player import Player, ActionData
+from core.player import Player, ActionData
 import game
 
 
