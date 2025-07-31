@@ -18,7 +18,7 @@ class CatanEnv(gym.Env):
             "edges": gym.spaces.Box(low=0, high=10, shape=(72,), dtype=np.int32),
             "tiles": gym.spaces.Box(low=0, high=10, shape=(19,), dtype=np.int32),
             "turn_index": gym.spaces.Discrete(200),
-            "actions": gym.paces.Box(low=0, high=100, shape=(1000, 6), dtype=np.int32)
+            "actions": gym.spaces.Box(low=0, high=100, shape=(1000, 6), dtype=np.int32)
         })
 
         # Define action space
