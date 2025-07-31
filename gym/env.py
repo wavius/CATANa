@@ -12,7 +12,14 @@ class CatanEnv(gym.Env):
         num_actions = 1000
 
         # Define observation space
-        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(gym.obs_dim,), dtype=np.float32)
+        self.observation_space = gym.spaces.Dict({
+            "player_state": gym.spaces.Box(low=0, high=100, shape=(14,), dtype=np.int32),
+            "nodes": gym.spaces.Box(low=0, high=10, shape=(54,), dtype=np.int32),
+            "edges": gym.spaces.Box(low=0, high=10, shape=(72,), dtype=np.int32),
+            "tiles": gym.spaces.Box(low=0, high=10, shape=(19,), dtype=np.int32),
+            "turn_index": gym.spaces.Discrete(200),
+            "actions": gym.paces.Box(low=0, high=100, shape=(1000, 6), dtype=np.int32)
+        })
 
         # Define action space
         self.action_space = gym.spaces.Discrete(num_actions)
@@ -102,6 +109,14 @@ class CatanEnv(gym.Env):
             # Check victory
             if self.catan_game.check_victory(current_player):
                 reward = 1.0 if is_agent_turn else -1.0
+                terminated = True
+                obs = self._get_obs()
+                info = self._get_info()
+                return obs, reward, terminated, truncated, info
+            
+            # Check turn limit
+            if self.catan_game.turn_number > 200:
+                reward = 0.0
                 terminated = True
                 obs = self._get_obs()
                 info = self._get_info()
