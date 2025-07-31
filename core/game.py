@@ -41,7 +41,7 @@ class Game:
         "brick": 3,
         "sheep": 4,
         "wheat": 4,
-        "ore": 3,
+        "stone": 3,
         "desert": 1
     }
 

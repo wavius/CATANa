@@ -28,22 +28,13 @@ for episode in tqdm(range(n_episodes)):
     obs, info = env.reset()
     done = False
 
+    print("\nAgent:", env.env.agent_player.id)
+    print("-----")
+
     # Play setup turns
-    while env.catan_game.turn_number <= 2 * len(env.catan_game.players):
-        action = agent.get_action(obs)
-        # Take action and observe result
-        next_obs, reward, terminated, truncated, info = env.step(action)
-
-        # Learn from this experience
-        agent.update(obs, action, reward, terminated, next_obs)
-
-    # Play one game
-    while not done:
-        # Agent chooses action (initially random, gradually more intelligent)
-        next_obs, reward, terminated, truncated, info = env.step(None)
+    while env.env.catan_game.turn_number <= 2 * len(env.env.catan_game.players):
 
         action = agent.get_action(obs)
-
         # Take action and observe result
         next_obs, reward, terminated, truncated, info = env.step(action)
 
@@ -53,6 +44,22 @@ for episode in tqdm(range(n_episodes)):
         # Move to next state
         done = terminated or truncated
         obs = next_obs
+
+    # Play one game
+    while not done:
+        
+        next_obs, reward, terminated, truncated, info = env.step(None)
+        action = agent.get_action(obs)
+        # Take action and observe result
+        next_obs, reward, terminated, truncated, info = env.step(action)
+
+        # Learn from this experience
+        agent.update(obs, action, reward, terminated, next_obs)
+
+        # Move to next state
+        done = terminated or truncated
+        obs = next_obs
+
 
     # Reduce exploration rate (agent becomes less random over time)
     agent.decay_epsilon()

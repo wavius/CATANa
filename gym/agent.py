@@ -1,4 +1,4 @@
-import collections as defaultdict
+from collections import defaultdict
 import gymnasium as gym
 import numpy as np
 import random
@@ -27,11 +27,10 @@ class CatanAgent:
 
         # Q-table: maps (state, action) to expected reward
         # defaultdict automatically creates entries with zeros for new states
-        ### MUST BE CHANGED
         self.q_values = defaultdict(lambda: np.zeros(env.action_space.n))
 
         self.learning_rate = learning_rate
-        self.initial_epsilon = initial_epsilon
+        self.epsilon = initial_epsilon
         self.epsilon_decay = epsilon_decay
         self.final_epsilon = final_epsilon
         self.discount_factor = discount_factor
@@ -45,11 +44,16 @@ class CatanAgent:
             action: Index of chosen action vector 
         """
         legal_actions = obs["actions"]
+
+        # Returns a tuple for player state 
         state_key = self.encode_state(obs)
 
         # Explore
         if np.random.random() < self.epsilon:
-            return random.choice(legal_actions)
+            choice = random.choice(legal_actions)
+            for idx, a in enumerate(obs["actions"]):
+                if np.array_equal(a, choice):
+                    return idx
 
         # Exploit
         q_values = []
@@ -58,9 +62,11 @@ class CatanAgent:
             q_values.append(self.q_values[(state_key, action_key)])
 
         best_idx = int(np.argmax(q_values))
-        action_idx = obs["actions"].index(legal_actions[best_idx])
-
-        return action_idx
+        for idx, a in enumerate(obs["actions"]):
+            if np.array_equal(a, legal_actions[best_idx]):
+                return idx
+        
+        return -1
             
     def update(
             self,

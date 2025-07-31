@@ -23,14 +23,13 @@ class CatanEnv(gym.Env):
 
         # Define action space
         self.action_space = gym.spaces.Discrete(num_actions)
-
-        # Initialize players
-        for name in self.catan_game.PLAYER_NAMES:
-            self.catan_game.players.append(player.Player(name))
         
         # Initialize game
         self.catan_game = game.Game()
 
+        # Initialize players
+        for name in self.catan_game.PLAYER_NAMES:
+            self.catan_game.players.append(player.Player(name))
         self.current_player = None
     
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
@@ -44,16 +43,20 @@ class CatanEnv(gym.Env):
         # Initialize game
         self.catan_game = game.Game()
         
-        self.agent_player = self.catan_game.players[random.randint(0, 3)]
+        # Initialize players
+        for name in self.catan_game.PLAYER_NAMES:
+            self.catan_game.players.append(player.Player(name))
+        self.current_player = None
+
+        #self.agent_player = self.catan_game.players[random.randint(0, 3)]
+
+        self.agent_player = self.catan_game.players[0]
 
         # Turn game state into numeric vector
         obs = self._get_obs()
         info = self._get_info()
-        reward = 0.0
-        terminated = False
-        truncated = False
 
-        return obs, reward, terminated, truncated, info
+        return obs, info
 
     def step(self, action=None):
         """Execute one timestep within the environment.
@@ -68,7 +71,7 @@ class CatanEnv(gym.Env):
 
         # Setup phase
         if self.catan_game.turn_number <= 2 * len(self.catan_game.players):
-            return self.setup_turns_logic(self, action)
+            return self.setup_turns_logic(action)
 
         # Loop until agent's turn OR game is done
         while True:
@@ -101,10 +104,20 @@ class CatanEnv(gym.Env):
                 else:
                     # Wait for agent to act
                     actions.execute_action(action_list, action, current_player, self.catan_game)
+
+                    # Debugging
+                    print("Turn:", self.catan_game.turn_number)
+                    print("Player:", self.catan_game.current_player_idx)
+                    print("------")
             else:
                 # Bot randomly selects
                 bot_action = random.randint(0, len(action_list) - 1)
                 actions.execute_action(action_list, bot_action, current_player, self.catan_game)
+                
+                # Debugging
+                print("Turn:", self.catan_game.turn_number)
+                print("Player:", self.catan_game.current_player_idx)
+                print("------")
 
             # Check victory
             if self.catan_game.check_victory(current_player):
@@ -167,6 +180,12 @@ class CatanEnv(gym.Env):
         Returns:
             tuple: (observation, reward, terminated, truncated, info)
         """
+        def safe_randint(start, stop):
+            "Returns 0 if randint(start, stop) would return a ValueError."
+            if stop <= start:
+                return 0
+            return random.randint(start, stop)
+        
         reward = 0.0
         done = False
         truncated = False
@@ -179,25 +198,41 @@ class CatanEnv(gym.Env):
             if is_agent_turn:
                 if action is None:
                     # Agent needs to be given an action next step()
-                    obs = self.catan_game.get_observation()
+                    obs = self._get_obs()
                     return obs, reward, done, truncated, info
                 else:
+                    
                     # Agent acts now
                     action_list = actions.search_action(current_player, self.catan_game)
                     actions.execute_action(action_list, action, current_player, self.catan_game)
+
+                    # Debugging
+                    print("Turn:", self.catan_game.turn_number)
+                    print("Player:", self.catan_game.players[self.catan_game.current_player_idx].id)
+                    print("------")
+
                     self.catan_game.finish_turn()
+                    
             else:
                 # Bot acts
                 action_list = actions.search_action(current_player, self.catan_game)
-                bot_action = random.randint(0, len(action_list) - 1)
+
+                bot_action = safe_randint(0, len(action_list) - 1)
                 actions.execute_action(action_list, bot_action, current_player, self.catan_game)
+
+                # Debugging
+                print("Turn:", self.catan_game.turn_number)
+                print("Player:", self.catan_game.players[self.catan_game.current_player_idx].id)
+                print("------")
+
                 self.catan_game.finish_turn()
+
 
             # Setup is finished after 2N turns
             if self.catan_game.turn_number > 2 * len(self.catan_game.players):
                 break
 
-        obs = self.catan_game.get_observation()
+        obs = self._get_obs()
         return obs, reward, done, truncated, info
     
     def encode_player_state(self, p: player.Player):
@@ -209,23 +244,23 @@ class CatanEnv(gym.Env):
         """
 
         total_pieces = 0
-        for name, data in p.pieces:
+        for name, data in p.pieces.items():
             if name != "roads":
                 total_pieces += data
 
         total_resources = 0
-        for name, data in p.resource_cards:
+        for name, data in p.resource_cards.items():
             total_resources += data
         
         total_development_cards = 0
-        for name, data in p.development_cards:
+        for name, data in p.development_cards.items():
             total_development_cards += data
 
         player_state = [total_pieces, total_resources, total_development_cards, p.vic_points]
 
         return np.array(player_state)
 
-    def encode_node_data(nodes_dict: dict):
+    def encode_node_data(self, nodes_dict: dict):
         """Numerically encodes node dictionary to an array.
         Args:
             nodes_dict: Nodes dictionary
@@ -259,7 +294,7 @@ class CatanEnv(gym.Env):
 
         return np.array(node_data)
     
-    def encode_edge_data(edges_dict: dict):
+    def encode_edge_data(self, edges_dict: dict):
         """Numerically encodes edge dictionary to an array.
         Args:
             edges_dict: Edges dictionary
@@ -285,7 +320,7 @@ class CatanEnv(gym.Env):
 
         return np.array(edge_data)
     
-    def encode_board_data(board_dict: dict):
+    def encode_board_data(self, board_dict: dict):
         """Numerically encodes board dictionary to an array.
         Args:
             board_dict: board dictionary
@@ -294,16 +329,15 @@ class CatanEnv(gym.Env):
         """
         
         RESOURCE_MAP = {
-            "wheat": 1, "wood": 2,
-            "sheep": 3, "brick": 4, "rock": 5
+            "wheat": 1, "wood": 2, "sheep": 3, "brick": 4, "stone": 5, "desert": 6
         }
 
         tile_data = []
 
-        for i in range(1, 73):  # Edge ids 1 to 72
-            int, [resource, token, dots, has_robber] = board_dict[i]
+        for i in range(1, 18):
+            resource, token, dots, has_robber = board_dict[i]
 
-            int_encoded = int
+            int_encoded = i
             resource_encoded = RESOURCE_MAP[resource]
             token_encoded = token
             dots_encoded = dots
@@ -314,7 +348,7 @@ class CatanEnv(gym.Env):
 
         return np.array(tile_data)
     
-    def encode_action_data(action_list: list):
+    def encode_action_data(self, action_list: list):
         ACTION_TYPE_MAP = {
             'ActionType.START_TURNS': 1,
 
@@ -337,29 +371,29 @@ class CatanEnv(gym.Env):
         }
         
         ACTION_DATA_MAP = {
-            'BUILD_NODE_ID': 1,
-            'BUILD_EDGE_ID': 2,
-            'BUILD_EDGE_EXTRA_ID': 3,
+            'ActionData.BUILD_NODE_ID': 1,
+            'ActionData.BUILD_EDGE_ID': 2,
+            'ActionData.BUILD_EDGE_EXTRA_ID': 3,
 
-            'RESOURCE_GIVE': 4,
-            'RESOURCE_GET': 5,
-            'RESOURCE_GET_EXTRA': 6,
+            'ActionData.RESOURCE_GIVE': 4,
+            'ActionData.RESOURCE_GET': 5,
+            'ActionData.RESOURCE_GET_EXTRA': 6,
 
-            'TARGET_PLAYER': 7,
-            'PORT': 8,
+            'ActionData.TARGET_PLAYER': 7,
+            'ActionData.PORT': 8,
 
-            'ROBBER_TILE_ID': 9,
-            'ROBBER_PLAYER_TARGET': 10
+            'ActionData.ROBBER_TILE_ID': 9,
+            'ActionData.ROBBER_PLAYER_TARGET': 10
         }
         actions_list_encoded = []
         
         for action in action_list:
             
-            action_type = ACTION_TYPE_MAP[action.type]
+            action_type = ACTION_TYPE_MAP[str(action.type)]
             action_data = []
 
-            for key, value in action.data:
-                action_data.append(ACTION_DATA_MAP[key])
+            for key, value in action.data.items():
+                action_data.append(ACTION_DATA_MAP[str(key)])
                 action_data.append(value)
 
             action_vector = [action_type] + action_data

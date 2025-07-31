@@ -14,9 +14,12 @@ def execute_action(action_list: list, action_id: int, p: Player, g: game.Game):
     Executes chosen action from action_list[action_index] by updating action_data then calling the correct execute action method through ACTIONS[action_type] dict.
     """
     # action_list: [Action(ActionType, dict)] -> action_list = search_all(p, g)
+    print("Length of Action List:", len(action_list))
+    print("Action ID type:", type(action_id))
+    print("Action ID:", action_id)
     action_type = action_list[action_id].type
 
-    for key, value in action_list[action_id].data:
+    for key, value in action_list[int(action_id)].data.items():
         p.action_data[key] = value
 
     ACTIONS[action_type](p, g)
@@ -389,14 +392,12 @@ def search_build_settlement(p: Player, g: game.Game):
         # Loop over copy of open_nodes with [:]
         for key in open_nodes[:]:
             for edge in g.edges:
-                # edge[0] contains the two nodes connected by the edge
                 if key in g.edges[edge][0]:
-                    # Get the other node in the edge
                     for node in g.edges[edge][0]:
                         if node != key and g.nodes[node][1][1] != "none":
                             open_nodes.remove(key)
-                            break  # stop checking this key
-                    break # stop checking other edges after removing key
+                            break
+                    break
 
         for node in open_nodes:
             new_action = Action(ActionType.BUILD_SETTLEMENT, {ActionData.BUILD_EDGE_ID: node})
@@ -707,8 +708,6 @@ def check_longest_road(p: Player, g: game.Game):
     longest = 0
     for node in adj:
         longest = max(longest, dfs(node, set()))
-    
-    print("longest = ", longest)
 
     if longest < 5:
         return
