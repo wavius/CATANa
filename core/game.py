@@ -250,17 +250,14 @@ class Game:
         if self.turn_number <= (2 * num_players) - 1:
             t = self.turn_number  # turn count so far
             if t < num_players:
-                self.current_player_idx = t  # 0, 1, 2, 3
+                self.current_player_idx = t - 1 # 0, 1, 2, 3
             else:
                 self.current_player_idx = (2 * num_players - 1) - t  # 3, 2, 1, 0
-            self.turn_number += 1
         elif self.turn_number == 8: # Player 1 gets two turns in a row, the final setup turn and the first actual game turn
             self.current_player_idx = 0
-            self.turn_number += 1
         else:
             # Normal clockwise turn order
             self.current_player_idx = (self.current_player_idx + 1) % num_players
-            self.turn_number += 1
 
 
     # ----------------------------------------

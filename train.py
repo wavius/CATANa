@@ -5,11 +5,11 @@ from tqdm import tqdm  # Progress bar
 
 
 # Training hyperparameters
-learning_rate = 0.01        # How fast to learn (higher = faster but less stable)
-n_episodes = 1       # Number of hands to practice
-start_epsilon = 1.0         # Start with 100% random actions
+learning_rate = 0.01                              # How fast to learn (higher = faster but less stable)
+n_episodes = 1                                    # Number of hands to practice
+start_epsilon = 1.0                               # Start with 100% random actions
 epsilon_decay = start_epsilon / (n_episodes / 2)  # Reduce exploration over time
-final_epsilon = 0.1         # Always keep some exploration
+final_epsilon = 0.1                               # Always keep some exploration
 
 # Create environment and agent
 env = CatanEnv()
@@ -41,9 +41,10 @@ for episode in tqdm(range(n_episodes)):
         # Learn from this experience
         agent.update(obs, action, reward, terminated, next_obs)
 
-        # Move to next state
-        done = terminated or truncated
-        obs = next_obs
+        for i in range(0,5):
+            next_obs, reward, terminated, truncated, info = env.step(None)
+            done = terminated or truncated
+            obs = next_obs
 
     # Play one game
     while not done:
@@ -55,6 +56,9 @@ for episode in tqdm(range(n_episodes)):
 
         # Learn from this experience
         agent.update(obs, action, reward, terminated, next_obs)
+
+        for i in range (0, 3):
+            next_obs, reward, terminated, truncated, info = env.step(None)
 
         # Move to next state
         done = terminated or truncated
